@@ -1,0 +1,18 @@
+﻿{
+  "Name": "ExampleMod1",
+  "Author": "himdo",
+  "Version": "1.0.0",
+  "Description": "This is an example mod",
+  "UniqueID": "himdo.ExampleMod1",
+  "EntryDll": "ExampleMod1.dll",
+  "MinimumApiVersion": "3.0.0",
+  "Dependencies": [
+    {
+      "UniqueID": "spacechase0.SpaceCore"
+    },
+    {
+      "UniqueID": "spacechase0.JsonAssets"
+    }
+  ],
+  "UpdateKeys": []
+}
