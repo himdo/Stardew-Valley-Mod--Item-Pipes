@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
@@ -7,9 +8,9 @@ using SpaceShared.APIs;
 using StardewValley;
 using SpaceCore;
 using SpaceCore.Framework;
-using CustomCraftingRecipeFramework = SpaceCore.Framework.CustomCraftingRecipe;
+//using CustomCraftingRecipeFramework = SpaceCore.Framework.CustomCraftingRecipe;
 using CustomCraftingRecipeCore = SpaceCore.CustomCraftingRecipe;
-//using IJsonAssetsApi = SpaceShared.APIs.IJsonAssetsApi;
+using System.Collections.Generic;
 
 namespace ExampleMod1
 {
@@ -21,7 +22,7 @@ namespace ExampleMod1
         public static Mod Instance;
         public static IMonitor _Monitor;
         internal static IJsonAssetsApi Ja;
-        internal static System.Collections.Generic.List<CustomCraftingRecipeCore> customCraftingRecipes;
+        internal static List<CustomCraftingRecipeCore> customCraftingRecipes;
 
         //internal static Dictionary<string, ItemDefinition> ItemDefinitions = null;
 

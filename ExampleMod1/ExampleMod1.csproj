@@ -48,6 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Mod\Inserter.cs" />
+    <Compile Include="Mod\InserterCustomUI.cs" />
     <Compile Include="Mod\ModEntry.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

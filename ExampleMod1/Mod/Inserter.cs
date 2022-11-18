@@ -163,8 +163,12 @@ namespace ExampleMod1
 
         public override bool performToolAction(Tool t, GameLocation location)
         {
+            ModEntry._Monitor.Log($"perform Tool Action", LogLevel.Debug);
             if (t == null)
+            {
+
                 return false;
+            }
 
             if (t is MeleeWeapon || !t.isHeavyHitter())
             {
@@ -179,6 +183,23 @@ namespace ExampleMod1
             return false;
         }
 
+        public override bool clicked(Farmer who)
+        {
+            ModEntry._Monitor.Log($"clicked", LogLevel.Debug);
+            return base.clicked(who);
+        }
+        public override bool checkForAction(Farmer who, bool justCheckingForActivity = false)
+        {
+            if (justCheckingForActivity)
+            {
+                return true;
+            }
+
+            //Game1.activeClickableMenu = new ItemGrabMenu((heldObject.Value as Chest).items, reverseGrab: false, showReceivingMenu: true, InventoryMenu.highlightAllItems, (heldObject.Value as Chest).grabItemFromInventory, null, grabItemFromAutoGrabber, snapToBottom: false, canBeExitedWithKey: true, playRightClickSound: true, allowRightClick: true, showOrganizeButton: true, 1, null, -1, this);
+            Game1.activeClickableMenu = new InserterCustomUI();
+            return true;
+        }
+        
         public override void drawWhenHeld(SpriteBatch spriteBatch, Vector2 objectPosition, Farmer f)
         {
             var tex = this.GetMainTexture();
