@@ -1,19 +1,15 @@
 ﻿using System;
-using System.IO;
 using Microsoft.Xna.Framework;
-using Pathoschild.Stardew.Common.Integrations.JsonAssets;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
-using StardewModdingAPI.Utilities;
 using SpaceShared;
 using SpaceShared.APIs;
-using StardewValley.Objects;
-//using Pathoschild.Stardew.Automate.Framework;
 using StardewValley;
-using System.Collections.Generic;
-using System.Linq;
 using SpaceCore;
-//using Pathoschild.Stardew.Automate;
+using SpaceCore.Framework;
+using CustomCraftingRecipeFramework = SpaceCore.Framework.CustomCraftingRecipe;
+using CustomCraftingRecipeCore = SpaceCore.CustomCraftingRecipe;
+//using IJsonAssetsApi = SpaceShared.APIs.IJsonAssetsApi;
 
 namespace ExampleMod1
 {
@@ -24,6 +20,8 @@ namespace ExampleMod1
         //private static IJsonAssetsApi Ja;
         public static Mod Instance;
         public static IMonitor _Monitor;
+        internal static IJsonAssetsApi Ja;
+        internal static System.Collections.Generic.List<CustomCraftingRecipeCore> customCraftingRecipes;
 
         //internal static Dictionary<string, ItemDefinition> ItemDefinitions = null;
 
@@ -36,10 +34,10 @@ namespace ExampleMod1
         {
             ModEntry.Instance = this;
             ModEntry._Monitor = this.Monitor;
-
             helper.Events.Input.ButtonPressed += this.OnButtonPressed;
             helper.Events.GameLoop.GameLaunched += this.GameLaunchedHandler;
-            this.Helper.Events.GameLoop.DayStarted += this.GameLoop_DayStarted;
+            helper.Events.GameLoop.DayStarted += this.GameLoop_DayStarted;
+            //helper.Events.Content.AssetRequested += this.OnAssetRequested;
 
         }
 
@@ -49,15 +47,69 @@ namespace ExampleMod1
         *********/
         private void GameLaunchedHandler(object sender, GameLaunchedEventArgs e)
         {
+            //_Monitor.Log($"ModEntry.Ja is starting INIT", LogLevel.Debug);
+            //ModEntry.Ja = this.Helper.ModRegistry.GetApi<IJsonAssetsApi>("spacechase0.JsonAssets");
+            //_Monitor.Log($"ModEntry.Ja is INIT", LogLevel.Debug);
+
             var sc = this.Helper.ModRegistry.GetApi<ISpaceCoreApi>("spacechase0.SpaceCore");
             sc.RegisterSerializerType(typeof(InserterObject));
-            CustomCraftingRecipe.CraftingRecipes.Add("Inserter", new InserterRecipe());
+            //customCraftingRecipes.Add(new InserterRecipe());
+            //CustomCraftingRecipeCore.CraftingRecipes.Add("Inserter", new InserterRecipe());
+            //CustomCraftingRecipeCore.CraftingRecipes.Add("Inserter", new CustomCraftingRecipe("Inserter", false,new InserterRecipe()));
+
+            //CraftingRecipe.craftingRecipes = content.Load<Dictionary<string, string>>("Data\\CraftingRecipes");
         }
+
+        //private void OnAssetRequested(object sender, AssetRequestedEventArgs e)
+        //{
+
+        //    _Monitor.Log($"In AssetRequested Locale After: ${e.NameWithoutLocale}", LogLevel.Debug);
+        //    if (e.NameWithoutLocale.IsEquivalentTo("Data\\CraftingRecipes"))
+        //    {
+        //        _Monitor.Log($"e.NameWithoutLocale.IsEquivalentTo", LogLevel.Debug);
+        //        //e.Edit(static asset =>
+        //        //e.Edit(asset =>
+        //        //{
+        //        //    var dict = asset.AsDictionary<string, string>().Data;
+
+        //        //    _Monitor.Log($" e.Edit(asset: ${dict}", LogLevel.Debug);
+        //        //    //dict.Add($"0 1/meow/0 1/true/{null} {0}/asdsad");
+        //        //    //dict.Add("Inserter", $"{InserterObject} 5/Field/434/false/null/Inserter");
+        //        //    //dict.Add("Inserter Recipe", $"{ModEntry.Ja.GetInserterObjectId("Frosty Stardrop Piece")} 5/Field/434/false/null/{I18n.Recipe_FrostyStardrop_Name()}");
+
+        //        //});
+
+        //        e.Edit((asset) =>
+        //        {
+        //            CraftingRecipePackData test = new InserterRecipe2();
+
+        //            var crecipe = new DGACustomCraftingRecipe(test);
+        //            _Monitor.Log($"e.NameWithoutLocale.IsEquivalentTo: ${crecipe.data.CraftingDataKey}", LogLevel.Debug);
+        //            var dict = asset.AsDictionary<string, string>().Data;
+        //            dict.Add(crecipe.data.CraftingDataKey, crecipe.data.CraftingDataValue);
+        //            //dict.Add(new CustomCraftingRecipeFramework("Inserter",false,null);
+
+        //            //var dict = asset.AsDictionary<string, string>().Data;
+        //            //int i = 0;
+        //            //foreach (var crecipe in ModEntry.customCraftingRecipes)
+        //            //{
+        //            //    if (crecipe.data.Enabled && !crecipe.data.IsCooking)
+        //            //    {
+        //            //        dict.Add(crecipe.data.CraftingDataKey, crecipe.data.CraftingDataValue);
+        //            //        ++i;
+        //            //    }
+        //            //}
+        //        });
+        //    }
+
+        //    //_Monitor.Log($"Finished AssetRequested", LogLevel.Debug);
+
+        //}
 
 
         private void GameLoop_DayStarted(object sender, DayStartedEventArgs e)
         {
-            _Monitor.Log($"${Game1.player.craftingRecipes}");
+            _Monitor.Log($"${Game1.player.craftingRecipes}", LogLevel.Debug);
             foreach (string key in Game1.player.craftingRecipes.Keys)
             {
                 _Monitor.Log($"${key}", LogLevel.Debug);

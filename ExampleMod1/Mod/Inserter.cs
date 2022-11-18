@@ -5,24 +5,35 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Netcode;
 using SpaceCore;
+using SpaceShared;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Locations;
 using StardewValley.Menus;
 using StardewValley.Objects;
 using StardewValley.Tools;
+using static SpaceCore.CustomCraftingRecipe;
 using SObject = StardewValley.Object;
 
 namespace ExampleMod1
 {
+
+    public enum Directions
+    {
+        NorthToSouth = 0,
+        EastToWest = 1,
+        SouthToNorth = 2,
+        WestToEast=3,
+    }
+
     [XmlType("Mods_himdo_Inserter")]
     public class InserterObject : SObject // must be public for the XML serializer
     {
         /*********
         ** Fields
         *********/
-        private static readonly Texture2D Tex = ModEntry.Instance.Helper.ModContent.Load<Texture2D>("assets/InserterUpToDown.png");
-
+        private static Texture2D Tex = ModEntry.Instance.Helper.ModContent.Load<Texture2D>("assets/InserterUpToDown.png");
+        private NetInt FacingDirection = new NetInt((int)Directions.NorthToSouth);
 
         /*********
         ** Accessors
@@ -33,7 +44,6 @@ namespace ExampleMod1
             get => this.name;
             set { }
         }
-
 
         /*********
         ** Public methods
@@ -46,10 +56,86 @@ namespace ExampleMod1
             this.DisplayName = this.loadDisplayName();
             this.bigCraftable.Value = true;
             this.Type = "Crafting"; // Makes performObjectDropInAction work for non-objects
+            //this.isRecipe = true;
 
             this.TileLocation = placement;
             this.boundingBox.Value = new Rectangle((int)placement.X * 64, (int)placement.Y * 64, 64, 64);
         }
+
+        public InserterObject(Directions direction,Vector2 placement)
+        {
+            this.FacingDirection = new NetInt((int) direction);
+            this.name = this.loadDisplayName();
+            this.DisplayName = this.loadDisplayName();
+            this.bigCraftable.Value = true;
+            this.Type = "Crafting"; // Makes performObjectDropInAction work for non-objects
+            //this.isRecipe = true;
+
+            this.TileLocation = placement;
+            this.boundingBox.Value = new Rectangle((int)placement.X * 64, (int)placement.Y * 64, 64, 64);
+        }
+
+        public override bool minutesElapsed(int minutes, GameLocation environment)
+        {
+
+            ModEntry._Monitor.Log($"${minutes}", LogLevel.Debug);
+            ModEntry._Monitor.Log($"${environment}", LogLevel.Debug);
+            ModEntry._Monitor.Log($"${this.TileLocation}", LogLevel.Debug);
+
+            // The code bellow comes directly from Super Hopper Mod TODO modify with custom Code
+
+            if (!environment.objects.TryGetValue(this.TileLocation - new Vector2(0, 1), out SObject objAbove) || !(objAbove is Chest chestAbove))
+            {
+
+                ModEntry._Monitor.Log($"Chest not found above", LogLevel.Debug);
+                return false;
+            }
+            if (!environment.objects.TryGetValue(this.TileLocation + new Vector2(0, 1), out SObject objBelow) || !(objBelow is Chest chestBelow))
+            {
+                ModEntry._Monitor.Log($"Chest not found Bellow", LogLevel.Debug);
+
+                return false;
+            }
+            ModEntry._Monitor.Log($"Chests found", LogLevel.Debug);
+            chestAbove.clearNulls();
+            // This iterates through the chest above and moves all the items it can to the chest below, if the below chest fills up then it won't move the item
+            for (int i = chestAbove.items.Count - 1; i >= 0; i--)
+            {
+                Item item = chestAbove.items[i];
+                if (chestBelow.addItem(item) == null)
+                    chestAbove.items.RemoveAt(i);
+            }
+            return false;
+        }
+
+        ///// <summary>Called after a machine updates on time change.</summary>
+        ///// <param name="machine">The machine that updated.</param>
+        ///// <param name="location">The location containing the machine.</param>
+        //private void OnMachineMinutesElapsed(SObject machine, GameLocation location)
+        //{
+        //    // not super hopper
+        //    if (!this.TryGetHopper(machine, out Chest hopper) || hopper.heldObject.Value == null || !Utility.IsNormalObjectAtParentSheetIndex(hopper.heldObject.Value, SObject.iridiumBar))
+        //        return;
+
+        //    // fix flag if needed
+        //    if (!hopper.modData.ContainsKey(this.ModDataFlag))
+        //        hopper.modData[this.ModDataFlag] = "1";
+
+        //    // no chests to transfer
+            //if (!location.objects.TryGetValue(hopper.TileLocation - new Vector2(0, 1), out SObject objAbove) || objAbove is not Chest chestAbove)
+            //    return;
+            //if (!location.objects.TryGetValue(hopper.TileLocation + new Vector2(0, 1), out SObject objBelow) || objBelow is not Chest chestBelow)
+            //    return;
+
+        //    // transfer items
+        //    chestAbove.clearNulls();
+        //    for (int i = chestAbove.items.Count - 1; i >= 0; i--)
+        //    {
+        //        Item item = chestAbove.items[i];
+        //        if (chestBelow.addItem(item) == null)
+        //            chestAbove.items.RemoveAt(i);
+        //    }
+        //}
 
         public override string getDescription()
         {
@@ -89,9 +175,9 @@ namespace ExampleMod1
             location.objects.Remove(this.TileLocation);
             this.DropItem(location, new InserterObject(Vector2.Zero));
             location.playSound("woodyStep");
+
             return false;
         }
-
 
         public override void drawWhenHeld(SpriteBatch spriteBatch, Vector2 objectPosition, Farmer f)
         {
@@ -144,7 +230,7 @@ namespace ExampleMod1
         }
         public static string GetNameFromVariantKey(string variantKey)
         {
-            return $"Inserter";
+            return "Inserter";
         }
 
         /// <summary>Drop an item onto the ground near the mannequin.</summary>
@@ -176,17 +262,41 @@ namespace ExampleMod1
     {
         public override string Description => "This is a test Description";
 
-        public override string Name => "Inserter";
+        public override string Name => "Inserter Recipe";
 
         public override Texture2D IconTexture => ModEntry.Instance.Helper.ModContent.Load<Texture2D>("assets/InserterUpToDown.png");
 
         public override Rectangle? IconSubrect => null;
 
-        public override IngredientMatcher[] Ingredients => new[] { new ObjectIngredientMatcher(SObject.wood, 1), new ObjectIngredientMatcher(SObject.stone, 1) };
+        public override IngredientMatcher[] Ingredients => new[] { new ObjectIngredientMatcher(388, 1) }; // , new ObjectIngredientMatcher(SObject.stone, 1)
 
+        //public CraftingRecipe NameWithoutLocale = new CraftingRecipe("Inserter", false);
         public override Item CreateResult()
         {
             return new InserterObject(Vector2.Zero);
         }
     }
+
+
+
+    //public class InserterRecipe2 : CraftingRecipePackData // must be public for the XML serializer
+    //{
+    //    public string Description => "This is a test Description";
+
+    //    public string Name => "Inserter Recipe";
+
+    //    public Texture2D IconTexture => ModEntry.Instance.Helper.ModContent.Load<Texture2D>("assets/InserterUpToDown.png");
+
+    //    public Rectangle? IconSubrect => null;
+
+    //    public IngredientMatcher[] Ingredients => new[] { new ObjectIngredientMatcher(388, 1) }; // , new ObjectIngredientMatcher(SObject.stone, 1)
+
+    //    public string ID = "997";
+
+    //    //public CraftingRecipe NameWithoutLocale = new CraftingRecipe("Inserter", false);
+    //    //public Item CreateResult()
+    //    //{
+    //    //    return new InserterObject(Vector2.Zero);
+    //    //}
+    //}
 }

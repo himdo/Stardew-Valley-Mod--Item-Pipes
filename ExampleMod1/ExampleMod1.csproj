@@ -33,10 +33,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Automate">
-      <HintPath>..\..\..\..\..\..\Users\Lennon\Desktop\Stardew Valley - Modding Test\Mods\Automate\Automate.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="SpaceCore">
       <HintPath>..\..\..\..\..\..\Users\Lennon\Desktop\Stardew Valley - Modding Test\Mods\SpaceCore\SpaceCore.dll</HintPath>
       <Private>False</Private>
@@ -59,18 +55,12 @@
     <None Include="manifest.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Mod\[DGA] ExampleMod1\big-craftables.json" />
-    <None Include="Mod\[DGA] ExampleMod1\i18n\default.json" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\InserterUpToDown.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Mod\[DGA] ExampleMod1\InserterUpToDown.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Mod\[DGA] ExampleMod1\manifest.json" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
