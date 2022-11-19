@@ -23,8 +23,9 @@ namespace ExampleMod1
         NorthToSouth = 0,
         EastToWest = 1,
         SouthToNorth = 2,
-        WestToEast=3,
+        WestToEast = 3,
     }
+
 
     [XmlType("Mods_himdo_Inserter")]
     public class InserterObject : SObject // must be public for the XML serializer
@@ -32,8 +33,8 @@ namespace ExampleMod1
         /*********
         ** Fields
         *********/
-        private static Texture2D Tex = ModEntry.Instance.Helper.ModContent.Load<Texture2D>("assets/InserterUpToDown.png");
-        private NetInt FacingDirection = new NetInt((int)Directions.NorthToSouth);
+        private Texture2D Tex = ModEntry.Instance.Helper.ModContent.Load<Texture2D>("assets/InserterUpToDown.png");
+        public NetInt FacingDirection = new NetInt((int)Directions.NorthToSouth);
 
         /*********
         ** Accessors
@@ -183,11 +184,11 @@ namespace ExampleMod1
             return false;
         }
 
-        public override bool clicked(Farmer who)
-        {
-            ModEntry._Monitor.Log($"clicked", LogLevel.Debug);
-            return base.clicked(who);
-        }
+        //public override bool clicked(Farmer who)
+        //{
+        //    ModEntry._Monitor.Log($"clicked", LogLevel.Debug);
+        //    return base.clicked(who);
+        //}
         public override bool checkForAction(Farmer who, bool justCheckingForActivity = false)
         {
             if (justCheckingForActivity)
@@ -196,7 +197,7 @@ namespace ExampleMod1
             }
 
             //Game1.activeClickableMenu = new ItemGrabMenu((heldObject.Value as Chest).items, reverseGrab: false, showReceivingMenu: true, InventoryMenu.highlightAllItems, (heldObject.Value as Chest).grabItemFromInventory, null, grabItemFromAutoGrabber, snapToBottom: false, canBeExitedWithKey: true, playRightClickSound: true, allowRightClick: true, showOrganizeButton: true, 1, null, -1, this);
-            Game1.activeClickableMenu = new InserterCustomUI();
+            Game1.activeClickableMenu = new InserterCustomUI(this);
             return true;
         }
         
@@ -275,7 +276,32 @@ namespace ExampleMod1
         /// <summary>Get the main mannequin texture to render.</summary>
         private Texture2D GetMainTexture()
         {
-            return InserterObject.Tex;
+            return this.Tex;
+        }
+        public void ChangeDirection(Directions newDirection)
+        {
+            this.FacingDirection.Set((int) newDirection);
+            this.SetTextureForDirection();
+        }
+        private void SetTextureForDirection()
+        {
+            switch (this.FacingDirection)
+            {
+                case (int)Directions.NorthToSouth:
+                    Tex = ModEntry.Instance.Helper.ModContent.Load<Texture2D>("assets/InserterUpToDown.png");
+                    break;
+                case (int)Directions.SouthToNorth:
+                    Tex = ModEntry.Instance.Helper.ModContent.Load<Texture2D>("assets/InserterDownToUp.png");
+                    break;
+                case (int)Directions.EastToWest:
+                    Tex = ModEntry.Instance.Helper.ModContent.Load<Texture2D>("assets/InserterRightToLeft.png");
+                    break;
+                case (int)Directions.WestToEast:
+                    Tex = ModEntry.Instance.Helper.ModContent.Load<Texture2D>("assets/InserterLeftToRight.png");
+                    break;
+                default:
+                    break;
+            }
         }
     }
 
