@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Xml.Serialization;
 using ExampleMod1;
 using Microsoft.Xna.Framework;
@@ -35,6 +36,8 @@ namespace ExampleMod1
         *********/
         private Texture2D Tex = ModEntry.Instance.Helper.ModContent.Load<Texture2D>("assets/InserterUpToDown.png");
         public NetInt FacingDirection = new NetInt((int)Directions.NorthToSouth);
+        public List<Item> WhiteListItems = new List<Item>();
+
 
         /*********
         ** Accessors

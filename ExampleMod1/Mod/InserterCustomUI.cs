@@ -22,19 +22,18 @@ namespace ExampleMod1
         private RootElement ui;
         private Table table;
         private InserterObject inserterInstance;
-        IList<Item> WhiteListItems;
         private int heightOffset = -120;
+        // TODO if you close the UI with an item in your hand it will delete the item FIXME
 
         public InserterCustomUI() : base(null, okButton: false, trashCan: false, 0,0)//12, 132)//: base((Game1.uiViewport.Width - 900) / 2, (Game1.uiViewport.Height - (Game1.uiViewport.Height - 100)) / 2, 900, (Game1.uiViewport.Height - 100))
         {
-            WhiteListItems = new List<Item>();
+
             //int num2 = 0;
             //int actualCapacity = WhiteListItems.Count + 1;
             //int rows = 3;
             //ItemsToGrabMenu = new InventoryMenu(Game1.uiViewport.Width / 2 - num2 / 2, yPositionOnScreen + 64, playerInventory: false, WhiteListItems, InventoryMenu.highlightAllItems, actualCapacity, rows);
             ReCreateUI();
         }
-        
         private void ReCreateUI()
         {
             ui = new RootElement()
@@ -126,30 +125,66 @@ namespace ExampleMod1
                 LocalPosition = new Vector2(width/2 - 120, 10),
             };
 
-            var itemSlot = new ItemSlot()
+            //var itemSlot = new ItemSlot()
+            //{
+            //    LocalPosition = new Vector2(150, height / 2 - 50 + heightOffset),
+            //    Callback = (e) => AddItem((ItemSlot) e),
+            //};
+            ////itemSlot.ItemDisplay
+            //ui.AddChild(itemSlot);
+            if (this.inserterInstance != null)
             {
-                LocalPosition = new Vector2(150, height / 2 - 50 + heightOffset),
-                Callback = (e) => AddItem((ItemSlot) e),
-            };
-            //itemSlot.ItemDisplay
-            ui.AddChild(itemSlot);
-
-            for (int i = 0; i < 3; i++)
-            {
-
                 List<Element> rowSlots = new List<Element>();
-                //table.AddRow(rowSlots.ToArray());
-                var rowElement = new Label()
+                int numberOfSlotsPerRow = 5;
+                for (int i = 0; i < inserterInstance.WhiteListItems.Count + 1; i++)
                 {
-                    String = $"This is a table Item ${i}",
-                    Bold = false,
-                };
-                rowElement.LocalPosition = new Vector2(10, 150 * (1 + i));
-                rowSlots.Add(rowElement);
-                table.AddRow(rowSlots.ToArray());
-                // This appears to only put blank spaces
-                for (int j = 0; j < 2; ++j)
-                    table.AddRow(new Element[0]);
+                    //if (i + 1 % numberOfSlotsPerRow == 0)
+                    //{
+                        //table.AddRow(rowSlots.ToArray());
+                //}
+                var itemSlot = new ItemSlot()
+                    {
+                        LocalPosition = new Vector2(10 + (100*(i% numberOfSlotsPerRow)), 150 * ((int)(Math.Ceiling((float) (i+1)/numberOfSlotsPerRow)))),
+                        Callback = (e) => AddItem((ItemSlot)e),
+                    };
+                    if (i < inserterInstance.WhiteListItems.Count)
+                    {
+                        itemSlot.ItemDisplay = inserterInstance.WhiteListItems[i];
+                    }
+                    rowSlots.Add(itemSlot);
+                    if ((i+1)% numberOfSlotsPerRow == 0)
+                    {
+                        table.AddRow(rowSlots.ToArray());
+                        // This appears to only put blank spaces
+                        for (int j = 0; j < 2; ++j)
+                            table.AddRow(new Element[0]);
+                        rowSlots = new List<Element>();
+                    }
+
+                    //itemSlot.ItemDisplay
+                    //ui.AddChild(itemSlot);
+                    //List<Element> rowSlots = new List<Element>();
+                    ////table.AddRow(rowSlots.ToArray());
+                    //var rowElement = new Label()
+                    //{
+                    //    String = $"This is a table Item ${i}",
+                    //    Bold = false,
+                    //};
+                    //rowElement.LocalPosition = new Vector2(10, 150 * (1 + i));
+                    //rowSlots.Add(rowElement);
+                    //table.AddRow(rowSlots.ToArray());
+                    //// This appears to only put blank spaces
+                    //for (int j = 0; j < 2; ++j)
+                    //    table.AddRow(new Element[0]);
+                }
+                if (rowSlots.Count > 0)
+                {
+                    table.AddRow(rowSlots.ToArray());
+                    // This appears to only put blank spaces
+                    for (int j = 0; j < 2; ++j)
+                        table.AddRow(new Element[0]);
+                    rowSlots = new List<Element>();
+                }
             }
             ui.AddChild(table);
 
@@ -274,9 +309,25 @@ namespace ExampleMod1
         }
         private void AddItem(ItemSlot e)
         {
-            ModEntry._Monitor.Log($"Add Item was clicked with Item: ${e.ItemDisplay}", LogLevel.Debug);
-            e.ItemDisplay = base.heldItem;
-            ModEntry._Monitor.Log($"Add Item was clicked with Item: ${e.ItemDisplay}", LogLevel.Debug);
+            if (base.heldItem == null)
+            {
+                ModEntry._Monitor.Log($"empty hand added", LogLevel.Debug);
+                inserterInstance.WhiteListItems.Remove(e.ItemDisplay);
+                e.ItemDisplay = null;
+                ReCreateUI();
+            }
+            else
+            {
+                if (!inserterInstance.WhiteListItems.Contains(base.heldItem))
+                {
+                    inserterInstance.WhiteListItems.Add(base.heldItem);
+                    e.ItemDisplay = base.heldItem;
+                    ReCreateUI();
+
+                }
+            }
+            ModEntry._Monitor.Log($"WhiteListItems Count: ${inserterInstance.WhiteListItems.Count}", LogLevel.Debug);
+
         }
     }
 
