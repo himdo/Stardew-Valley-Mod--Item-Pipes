@@ -50,31 +50,7 @@ namespace ExampleMod1
             title.LocalPosition = new Vector2((width - title.Width) / 2, 10 + heightOffset);
             ui.AddChild(title);
 
-            //table = new Table()
-            //{
-            //    RowHeight = (128 - 16) / 8,
-            //    Size = new Vector2(700, height - 200),
-            //    LocalPosition = new Vector2(50, 100),
-            //};
-
-            //for (int i = 0; i < 3; i ++)
-            //{
-
-            //    List<Element> rowSlots = new List<Element>();
-            //    //table.AddRow(rowSlots.ToArray());
-            //    var rowElement = new Label()
-            //    {
-            //        String = $"This is a table Item ${i}",
-            //        Bold = false,
-            //    };
-            //    rowElement.LocalPosition = new Vector2(150, 150 * (1 + i));
-            //    rowSlots.Add(rowElement);
-            //    table.AddRow(rowSlots.ToArray());
-            //    // This appears to only put blank spaces
-            //    for (int j = 0; j < 2; ++j)
-            //        table.AddRow(new Element[0]);
-            //}
-            //ui.AddChild(table);
+            
 
             var DirectionText = new Label()
             {
@@ -134,11 +110,50 @@ namespace ExampleMod1
             accept.LocalPosition = new Vector2((width - accept.Width) - 150, height / 2 + 5 + heightOffset);
             ui.AddChild(accept);
 
+
+            var whitelistText = new Label()
+            {
+                String = "Whitelist:",
+                Bold = true,
+            };
+            whitelistText.LocalPosition = new Vector2((3*(width - whitelistText.Width)) / 4, 60 + heightOffset);
+            ui.AddChild(whitelistText);
+
+            table = new Table()
+            {
+                RowHeight = (128 - 16) / 8,
+                Size = new Vector2(width/2 + 80, height/2 - 165),
+                LocalPosition = new Vector2(width/2 - 120, 10),
+            };
+
             var itemSlot = new ItemSlot()
             {
                 LocalPosition = new Vector2(150, height / 2 - 50 + heightOffset),
+                Callback = (e) => AddItem((ItemSlot) e),
             };
+            //itemSlot.ItemDisplay
             ui.AddChild(itemSlot);
+
+            for (int i = 0; i < 3; i++)
+            {
+
+                List<Element> rowSlots = new List<Element>();
+                //table.AddRow(rowSlots.ToArray());
+                var rowElement = new Label()
+                {
+                    String = $"This is a table Item ${i}",
+                    Bold = false,
+                };
+                rowElement.LocalPosition = new Vector2(10, 150 * (1 + i));
+                rowSlots.Add(rowElement);
+                table.AddRow(rowSlots.ToArray());
+                // This appears to only put blank spaces
+                for (int j = 0; j < 2; ++j)
+                    table.AddRow(new Element[0]);
+            }
+            ui.AddChild(table);
+
+            
 
         }
 
@@ -256,6 +271,12 @@ namespace ExampleMod1
         {
             ModEntry._Monitor.Log($"Accept was clicked", LogLevel.Debug);
             Exit();
+        }
+        private void AddItem(ItemSlot e)
+        {
+            ModEntry._Monitor.Log($"Add Item was clicked with Item: ${e.ItemDisplay}", LogLevel.Debug);
+            e.ItemDisplay = base.heldItem;
+            ModEntry._Monitor.Log($"Add Item was clicked with Item: ${e.ItemDisplay}", LogLevel.Debug);
         }
     }
 
