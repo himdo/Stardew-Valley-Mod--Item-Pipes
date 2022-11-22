@@ -21,17 +21,23 @@ namespace ExampleMod1
         private RootElement ui;
         private Table table;
         private InserterObject inserterInstance;
+        public InventoryMenu ItemsToGrabMenu;
+        IList<Item> WhiteListItems;
 
         public InserterCustomUI() : base((Game1.uiViewport.Width - 900) / 2, (Game1.uiViewport.Height - (Game1.uiViewport.Height - 100)) / 2, 900, (Game1.uiViewport.Height - 100))
         {
             ModEntry._Monitor.Log($"UI Set", LogLevel.Debug);
-
+            WhiteListItems = new List<Item>();
+            int num2 = 0;
+            int actualCapacity = WhiteListItems.Count + 1;
+            int rows = 3;
+            //ItemsToGrabMenu = new InventoryMenu(Game1.uiViewport.Width / 2 - num2 / 2, yPositionOnScreen + 64, playerInventory: false, WhiteListItems, InventoryMenu.highlightAllItems, actualCapacity, rows);
             ReCreateUI();
         }
 
         private void ReCreateUI()
         {
-
+            Game1.activeClickableMenu = ItemsToGrabMenu;
             ui = new RootElement();
             ui.LocalPosition = new Vector2(xPositionOnScreen, yPositionOnScreen);
 
@@ -125,6 +131,12 @@ namespace ExampleMod1
                 Callback = (e) => Accept(),
             };
             ui.AddChild(accept);
+
+            //if (heldItem != null)
+            //{
+            //    heldItem.drawInMenu(b, new Vector2(Game1.getOldMouseX() + 8, Game1.getOldMouseY() + 8), 1f);
+            //}
+            //ui.AddChild(ItemsToGrabMenu.)
         }
 
         public InserterCustomUI(InserterObject instance): this()

@@ -85,28 +85,76 @@ namespace ExampleMod1
 
             // The code bellow comes directly from Super Hopper Mod TODO modify with custom Code
 
-            if (!environment.objects.TryGetValue(this.TileLocation - new Vector2(0, 1), out SObject objAbove) || !(objAbove is Chest chestAbove))
+            if (!environment.objects.TryGetValue(this.TileLocation - GetFromChestVector(), out SObject objFrom) || !(objFrom is Chest chestFrom))
             {
 
                 ModEntry._Monitor.Log($"Chest not found above", LogLevel.Debug);
                 return false;
             }
-            if (!environment.objects.TryGetValue(this.TileLocation + new Vector2(0, 1), out SObject objBelow) || !(objBelow is Chest chestBelow))
+            if (!environment.objects.TryGetValue(this.TileLocation + GetFromChestVector(), out SObject objTo) || !(objTo is Chest chestTo))
             {
                 ModEntry._Monitor.Log($"Chest not found Bellow", LogLevel.Debug);
 
                 return false;
             }
             ModEntry._Monitor.Log($"Chests found", LogLevel.Debug);
-            chestAbove.clearNulls();
-            // This iterates through the chest above and moves all the items it can to the chest below, if the below chest fills up then it won't move the item
-            for (int i = chestAbove.items.Count - 1; i >= 0; i--)
+            chestFrom.clearNulls();
+            for (int i = 0; i < minutes; i++)
             {
-                Item item = chestAbove.items[i];
-                if (chestBelow.addItem(item) == null)
-                    chestAbove.items.RemoveAt(i);
+                bool movedItem = MoveOneItem(chestFrom, chestTo);
+                if (!movedItem) break;
+
             }
             return false;
+        }
+
+        private bool MoveOneItem(Chest chestFrom, Chest chestTo)
+        {
+            chestFrom.clearNulls();
+            for (int i = 0; i < chestFrom.items.Count; i++)
+            {
+                Item item = chestFrom.items[i];
+                int itemStack = item.Stack;
+                Item itemOne = item.getOne();
+                Item movedTo = chestTo.addItem(itemOne);
+
+                if (movedTo == null)
+                {
+                    if (itemStack == 1)
+                    {
+                        chestFrom.items.RemoveAt(i);
+                    } else
+                    {
+                        chestFrom.items.RemoveAt(i);
+                        item.Stack = itemStack - 1;
+                        chestFrom.items.Insert(i, item);
+                    }
+
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private Vector2 GetFromChestVector()
+        {
+            Vector2 FromDirection = new Vector2();
+            switch (FacingDirection)
+            {
+                case (int)Directions.NorthToSouth:
+                    FromDirection = new Vector2(0, 1);
+                    break;
+                case (int)Directions.SouthToNorth:
+                    FromDirection = new Vector2(0, -1);
+                    break;
+                case (int)Directions.EastToWest:
+                    FromDirection = new Vector2(-1, 0);
+                    break;
+                case (int)Directions.WestToEast:
+                    FromDirection = new Vector2(1, 0);
+                    break;
+            }
+            return FromDirection;
         }
 
         ///// <summary>Called after a machine updates on time change.</summary>
@@ -194,6 +242,10 @@ namespace ExampleMod1
             if (justCheckingForActivity)
             {
                 return true;
+            }
+            if (!Game1.didPlayerJustRightClick(ignoreNonMouseHeldInput: true))
+            {
+                return false;
             }
 
             //Game1.activeClickableMenu = new ItemGrabMenu((heldObject.Value as Chest).items, reverseGrab: false, showReceivingMenu: true, InventoryMenu.highlightAllItems, (heldObject.Value as Chest).grabItemFromInventory, null, grabItemFromAutoGrabber, snapToBottom: false, canBeExitedWithKey: true, playRightClickSound: true, allowRightClick: true, showOrganizeButton: true, 1, null, -1, this);
