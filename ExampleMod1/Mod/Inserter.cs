@@ -119,22 +119,40 @@ namespace ExampleMod1
                 Item item = chestFrom.items[i];
                 int itemStack = item.Stack;
                 Item itemOne = item.getOne();
-                Item movedTo = chestTo.addItem(itemOne);
-
-                if (movedTo == null)
+                bool canMoveItem = WhiteListItems.Count == 0;
+                if (!canMoveItem)
                 {
-                    if (itemStack == 1)
+                    for (int itemCount = 0; itemCount < WhiteListItems.Count; itemCount++)
                     {
-                        chestFrom.items.RemoveAt(i);
-                    } else
-                    {
-                        chestFrom.items.RemoveAt(i);
-                        item.Stack = itemStack - 1;
-                        chestFrom.items.Insert(i, item);
+                        Item whiteListItem = WhiteListItems[itemCount];
+                        if (itemOne.canStackWith(whiteListItem) || itemOne.ParentSheetIndex == whiteListItem.ParentSheetIndex)
+                        {
+                            canMoveItem = true;
+                            break;
+                        }
                     }
-
-                    return true;
                 }
+                if (canMoveItem)
+                {
+                    Item movedTo = chestTo.addItem(itemOne);
+
+                    if (movedTo == null)
+                    {
+                        if (itemStack == 1)
+                        {
+                            chestFrom.items.RemoveAt(i);
+                        }
+                        else
+                        {
+                            chestFrom.items.RemoveAt(i);
+                            item.Stack = itemStack - 1;
+                            chestFrom.items.Insert(i, item);
+                        }
+
+                        return true;
+                    }
+                }
+                
             }
             return false;
         }
