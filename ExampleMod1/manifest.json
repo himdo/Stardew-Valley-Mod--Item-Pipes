@@ -5,7 +5,7 @@
   "Description": "This is an example mod",
   "UniqueID": "himdo.ExampleMod1",
   "EntryDll": "ExampleMod1.dll",
-  "MinimumApiVersion": "3.0.0",
+  "MinimumApiVersion": "3.13.0",
   "Dependencies": [
     {
       "UniqueID": "spacechase0.SpaceCore"

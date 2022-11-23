@@ -16,8 +16,9 @@ using StardewValley.Objects;
 using StardewValley.Tools;
 using System.Xml.Linq;
 using SObject = StardewValley.Object;
+using ExampleMod1.Inserter;
 
-namespace ExampleMod1
+namespace ExampleMod1.InserterUI
 {
     public class InserterCustomUI : MenuWithInventory
     {
@@ -224,7 +225,7 @@ namespace ExampleMod1
             if (base.heldItem != null)
             {
                 Game1.player.addItemToInventory(base.heldItem);
-                base.heldItem = null;
+                //base.heldItem = null;
             }
             base.cleanupBeforeExit();
         }

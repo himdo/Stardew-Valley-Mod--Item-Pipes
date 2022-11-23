@@ -1,29 +1,28 @@
-﻿
-using System;
+﻿using ExampleMod1.Inserter;
 using Microsoft.Xna.Framework;
-using StardewModdingAPI;
-using StardewModdingAPI.Events;
+using Microsoft.Xna.Framework.Graphics;
 using SpaceShared;
 using SpaceShared.APIs;
+using StardewModdingAPI;
+using StardewModdingAPI.Events;
 using StardewValley;
-using SpaceCore;
-using SpaceCore.Framework;
-//using CustomCraftingRecipeFramework = SpaceCore.Framework.CustomCraftingRecipe;
-using CustomCraftingRecipeCore = SpaceCore.CustomCraftingRecipe;
-using System.Collections.Generic;
 using StardewValley.Menus;
+
+//using CustomCraftingRecipeFramework = SpaceCore.Framework.CustomCraftingRecipe;
+//using CustomCraftingRecipeCore = SpaceCore.CustomCraftingRecipe;
+using System.Collections.Generic;
 
 namespace ExampleMod1
 {
     /// <summary>The mod entry point.</summary>
-    public class ModEntry : Mod
+    public class ModEntry : StardewModdingAPI.Mod
     {
 
         //private static IJsonAssetsApi Ja;
         public static Mod Instance;
         public static IMonitor _Monitor;
         internal static IJsonAssetsApi Ja;
-        internal static List<CustomCraftingRecipeCore> customCraftingRecipes;
+        //internal static List<CustomCraftingRecipeCore> customCraftingRecipes;
 
         //internal static Dictionary<string, ItemDefinition> ItemDefinitions = null;
 
@@ -38,6 +37,7 @@ namespace ExampleMod1
             ModEntry._Monitor = this.Monitor;
             helper.Events.GameLoop.GameLaunched += this.GameLaunchedHandler;
             helper.Events.Display.MenuChanged += this.OnMenuChanged;
+            //helper.Events.Input.ButtonPressed += this.OnButtonPressed;
             //helper.Events.Content.AssetRequested += this.OnAssetRequested;
 
         }
@@ -67,16 +67,51 @@ namespace ExampleMod1
         /// <param name="e">The event arguments.</param>
         private void OnMenuChanged(object sender, MenuChangedEventArgs e)
         {
-            if (e.NewMenu is ShopMenu shop)
+            if (!(e.NewMenu is ShopMenu menu) || menu.portraitPerson == null)
+                return;
+
+            if (menu.portraitPerson?.Name == "Robin")
             {
-                if (shop.portraitPerson?.Name == "Robin")
-                {
-                    var inserter = new InserterObject(Vector2.Zero);
-                    shop.forSale.Add(inserter);
-                    shop.itemPriceAndStock.Add(inserter, new[] { 1500, int.MaxValue });
-                }
+                var forSale = menu.forSale;
+                var itemPriceAndStock = menu.itemPriceAndStock;
+
+                Item inserter = new InserterObject(Vector2.Zero);
+                forSale.Add(inserter);
+                itemPriceAndStock.Add(inserter, new[] { 
+                    100,            // Price
+                    int.MaxValue    // Quantity
+                });
             }
         }
+
+        /// <summary>Raised after the player presses a button on the keyboard, controller, or mouse.</summary>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event data.</param>
+        //private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
+        //{
+        //    // ignore if player hasn't loaded a save yet
+        //    if (!Context.IsWorldReady)
+        //        return;
+        //    if (e.Button.ToString().ToLower() == "n")
+        //    {
+        //        Game1.player.addItemByMenuIfNecessary(new InserterObject(Vector2.Zero));
+        //    } else if (e.Button.ToString().ToLower() == "b")
+        //    {
+        //        for (int i = 0; i < (int)Game1.player.maxItems; i++)
+        //        {
+        //            Item item = Game1.player.items[i];
+        //            if (item != null)
+        //                ModEntry._Monitor.Log($"Inventory: Slot: ${i} Name: ${item.Name}", LogLevel.Debug);
+        //            else
+        //            {
+        //                ModEntry._Monitor.Log($"Inventory: Slot: ${i} Name: NULL", LogLevel.Debug);
+        //            }
+
+        //        }
+        //    }
+        //    // print button presses to the console window
+        //    _Monitor.Log($"{Game1.player.Name} pressed {e.Button}.", LogLevel.Debug);
+        //}
 
 
         //private void OnAssetRequested(object sender, AssetRequestedEventArgs e)
@@ -136,23 +171,6 @@ namespace ExampleMod1
         //{
         //    Game1.player.craftingRecipes.Add(RecipeName, 0);
         //}
-        //}
-
-
-        ///// <summary>Raised after the player presses a button on the keyboard, controller, or mouse.</summary>
-        ///// <param name="sender">The event sender.</param>
-        ///// <param name="e">The event data.</param>
-        //private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
-        //{
-        //    // ignore if player hasn't loaded a save yet
-        //    if (!Context.IsWorldReady)
-        //        return;
-        //    if (e.Button.ToString().ToLower() == "n")
-        //    {
-        //        Game1.player.addItemToInventory(new InserterObject(Vector2.Zero));
-        //    }
-        //    // print button presses to the console window
-        //    _Monitor.Log($"{Game1.player.Name} pressed {e.Button}.", LogLevel.Debug);
         //}
     }
 }

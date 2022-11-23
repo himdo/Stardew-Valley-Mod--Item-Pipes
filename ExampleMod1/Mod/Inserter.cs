@@ -1,22 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Xml.Serialization;
-using ExampleMod1;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Netcode;
-using SpaceCore;
-using SpaceShared;
-using StardewModdingAPI;
 using StardewValley;
-using StardewValley.Locations;
 using StardewValley.Menus;
 using StardewValley.Objects;
 using StardewValley.Tools;
-using static SpaceCore.CustomCraftingRecipe;
 using SObject = StardewValley.Object;
 
-namespace ExampleMod1
+using System.Collections.Generic;
+using StardewModdingAPI;
+using ExampleMod1.InserterUI;
+
+namespace ExampleMod1.Inserter
 {
 
     public enum Directions
@@ -35,7 +32,7 @@ namespace ExampleMod1
         ** Fields
         *********/
         private Texture2D Tex = ModEntry.Instance.Helper.ModContent.Load<Texture2D>("assets/InserterUpToDown.png");
-        public NetInt FacingDirection = new NetInt((int)Directions.NorthToSouth);
+        public readonly NetInt FacingDirection = new NetInt((int)Directions.NorthToSouth);
         public List<Item> WhiteListItems = new List<Item>();
 
 
@@ -60,14 +57,14 @@ namespace ExampleMod1
             this.DisplayName = this.loadDisplayName();
             this.bigCraftable.Value = true;
             this.Type = "Crafting"; // Makes performObjectDropInAction work for non-objects
+            this.Price = 1500;
 
             this.TileLocation = placement;
             this.boundingBox.Value = new Rectangle((int)placement.X * 64, (int)placement.Y * 64, 64, 64);
         }
 
-        public InserterObject(Directions direction,Vector2 placement)
+        public InserterObject(Directions direction, Vector2 placement)
         {
-            this.FacingDirection = new NetInt((int) direction);
             this.name = this.loadDisplayName();
             this.DisplayName = this.loadDisplayName();
             this.bigCraftable.Value = true;
@@ -75,6 +72,7 @@ namespace ExampleMod1
 
             this.TileLocation = placement;
             this.boundingBox.Value = new Rectangle((int)placement.X * 64, (int)placement.Y * 64, 64, 64);
+            ChangeDirection(direction);
         }
 
         public override bool minutesElapsed(int minutes, GameLocation environment)
@@ -98,6 +96,12 @@ namespace ExampleMod1
             return false;
         }
 
+        public override Item getOne()
+        {
+            var ret = new InserterObject( Vector2.Zero);
+            ret._GetOneFrom(this);
+            return ret;
+        }
         private bool MoveOneItem(Chest chestFrom, Chest chestTo)
         {
             chestFrom.clearNulls();
@@ -211,6 +215,7 @@ namespace ExampleMod1
 
         public override bool checkForAction(Farmer who, bool justCheckingForActivity = false)
         {
+
             if (justCheckingForActivity)
             {
                 return true;
@@ -283,6 +288,19 @@ namespace ExampleMod1
         //** Protected methods
         //*********/
 
+        protected override void initNetFields()
+        {
+            base.initNetFields();
+            this.NetFields.AddFields(this.FacingDirection);
+
+            this.FacingDirection.fieldChangeEvent += this.OnNetFieldChanged;
+        }
+
+        private void OnNetFieldChanged<TNetField, TValue>(TNetField field, TValue oldValue, TValue newValue)
+        {
+            //this.FarmerForRenderingCache = null;
+            //ModEntry._Monitor.Log($"${field} changed from ${oldValue}, to ${newValue}",LogLevel.Debug);
+        }
         protected override string loadDisplayName()
         {
             return "Inserter";
@@ -320,24 +338,24 @@ namespace ExampleMod1
         }
     }
 
-    public class InserterRecipe : CustomCraftingRecipe // must be public for the XML serializer
-    {
-        public override string Description => "This is a test Description";
+    //public class InserterRecipe : CustomCraftingRecipe // must be public for the XML serializer
+    //{
+    //    public override string Description => "This is a test Description";
 
-        public override string Name => "Inserter Recipe";
+    //    public override string Name => "Inserter Recipe";
 
-        public override Texture2D IconTexture => ModEntry.Instance.Helper.ModContent.Load<Texture2D>("assets/InserterUpToDown.png");
+    //    public override Texture2D IconTexture => ModEntry.Instance.Helper.ModContent.Load<Texture2D>("assets/InserterUpToDown.png");
 
-        public override Rectangle? IconSubrect => null;
+    //    public override Rectangle? IconSubrect => null;
 
-        public override IngredientMatcher[] Ingredients => new[] { new ObjectIngredientMatcher(388, 1) }; // , new ObjectIngredientMatcher(SObject.stone, 1)
+    //    public override IngredientMatcher[] Ingredients => new[] { new ObjectIngredientMatcher(388, 1) }; // , new ObjectIngredientMatcher(SObject.stone, 1)
 
-        //public CraftingRecipe NameWithoutLocale = new CraftingRecipe("Inserter", false);
-        public override Item CreateResult()
-        {
-            return new InserterObject(Vector2.Zero);
-        }
-    }
+    //    //public CraftingRecipe NameWithoutLocale = new CraftingRecipe("Inserter", false);
+    //    public override Item CreateResult()
+    //    {
+    //        return new InserterObject(Vector2.Zero);
+    //    }
+    //}
 
 
 
