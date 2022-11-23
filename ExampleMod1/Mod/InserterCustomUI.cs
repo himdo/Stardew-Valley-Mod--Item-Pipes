@@ -14,6 +14,8 @@ using System.Reflection;
 using StardewModdingAPI;
 using StardewValley.Objects;
 using StardewValley.Tools;
+using System.Xml.Linq;
+using SObject = StardewValley.Object;
 
 namespace ExampleMod1
 {
@@ -213,73 +215,18 @@ namespace ExampleMod1
             drawMouse(b);
         }
 
-        //public override void receiveLeftClick(int x, int y, bool playSound = true)
-        //{
-        //    if (!okButton.containsPoint(x, y))
-        //        base.receiveLeftClick(x, y, playSound);
-
-        //    Item held = heldItem;
-            //if (mainSpot.containsPoint(x, y))
-            //{
-            //    if (secondarySpot.item == null)
-            //    {
-            //        var tmp = mainSpot.item;
-            //        mainSpot.item = heldItem;
-            //        heldItem = tmp;
-            //    }
-            //    else
-            //    {
-            //        Game1.playSound("cancel");
-            //    }
-            //}
-            //else if (secondarySpot.containsPoint(x, y) && mainSpot.item != null)
-            //{
-            //    bool doIt = false;
-            //    if (mainSpot.item is MeleeWeapon mw)
-            //    {
-            //        if (Utility.IsNormalObjectAtParentSheetIndex(heldItem, StardewValley.Object.prismaticShardIndex))
-            //            doIt = true;
-            //        else if (heldItem is IDGAItem dgai && dgai.FullId == ItemIds.SoulSapphire && (mw.InitialParentTileIndex == 62 || mw.InitialParentTileIndex == 63 || mw.InitialParentTileIndex == 64))
-            //            doIt = true;
-            //    }
-            //    else if (mainSpot.item is Tool)
-            //    {
-            //        if (Utility.IsNormalObjectAtParentSheetIndex(heldItem, StardewValley.Object.prismaticShardIndex))
-            //            doIt = true;
-            //    }
-            //    else
-            //    {
-            //        if (heldItem is IDGAItem dgai && dgai.FullId == ItemIds.PersistiumDust)
-            //            doIt = true;
-            //    }
-
-            //    if (doIt)
-            //    {
-            //        var tmp = secondarySpot.item;
-            //        secondarySpot.item = heldItem;
-            //        heldItem = tmp;
-            //    }
-            //    else
-            //    {
-            //        Game1.playSound("cancel");
-            //    }
-            //}
-            //else if (okButton.containsPoint(x, y))
-            //{
-            //    if (mainSpot.item != null && secondarySpot.item != null && Game1.player.hasItemInInventory(ItemIds.StellarEssence.GetDeterministicHashCode(), 25))
-            //    {
-            //        doingStars = 0;
-            //    }
-            //    else
-            //    {
-            //        Game1.playSound("cancel");
-            //    }
-            //}
-        //}
-
         public override void update(GameTime time)
         {
             ui.Update();
+        }
+        protected override void cleanupBeforeExit()
+        {
+            if (base.heldItem != null)
+            {
+                Game1.player.addItemToInventory(base.heldItem);
+                base.heldItem = null;
+            }
+            base.cleanupBeforeExit();
         }
         public override void receiveKeyPress(Keys key)
         {
@@ -304,14 +251,18 @@ namespace ExampleMod1
         }
         private void Accept()
         {
-            ModEntry._Monitor.Log($"Accept was clicked", LogLevel.Debug);
             Exit();
         }
+
+        public override void receiveScrollWheelAction(int direction)
+        {
+            this.table.Scrollbar.ScrollBy(direction / -120);
+        }
+
         private void AddItem(ItemSlot e)
         {
             if (base.heldItem == null)
             {
-                ModEntry._Monitor.Log($"empty hand added", LogLevel.Debug);
                 inserterInstance.WhiteListItems.Remove(e.ItemDisplay);
                 e.ItemDisplay = null;
                 ReCreateUI();
@@ -321,12 +272,11 @@ namespace ExampleMod1
                 if (!inserterInstance.WhiteListItems.Contains(base.heldItem))
                 {
                     inserterInstance.WhiteListItems.Add(base.heldItem);
-                    e.ItemDisplay = base.heldItem;
+                    e.ItemDisplay = base.heldItem.getOne();
                     ReCreateUI();
 
                 }
             }
-            ModEntry._Monitor.Log($"WhiteListItems Count: ${inserterInstance.WhiteListItems.Count}", LogLevel.Debug);
 
         }
     }

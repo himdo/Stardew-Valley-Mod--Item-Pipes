@@ -60,7 +60,6 @@ namespace ExampleMod1
             this.DisplayName = this.loadDisplayName();
             this.bigCraftable.Value = true;
             this.Type = "Crafting"; // Makes performObjectDropInAction work for non-objects
-            //this.isRecipe = true;
 
             this.TileLocation = placement;
             this.boundingBox.Value = new Rectangle((int)placement.X * 64, (int)placement.Y * 64, 64, 64);
@@ -73,7 +72,6 @@ namespace ExampleMod1
             this.DisplayName = this.loadDisplayName();
             this.bigCraftable.Value = true;
             this.Type = "Crafting"; // Makes performObjectDropInAction work for non-objects
-            //this.isRecipe = true;
 
             this.TileLocation = placement;
             this.boundingBox.Value = new Rectangle((int)placement.X * 64, (int)placement.Y * 64, 64, 64);
@@ -81,26 +79,15 @@ namespace ExampleMod1
 
         public override bool minutesElapsed(int minutes, GameLocation environment)
         {
-
-            ModEntry._Monitor.Log($"${minutes}", LogLevel.Debug);
-            ModEntry._Monitor.Log($"${environment}", LogLevel.Debug);
-            ModEntry._Monitor.Log($"${this.TileLocation}", LogLevel.Debug);
-
-            // The code bellow comes directly from Super Hopper Mod TODO modify with custom Code
-
             if (!environment.objects.TryGetValue(this.TileLocation - GetFromChestVector(), out SObject objFrom) || !(objFrom is Chest chestFrom))
             {
-
-                ModEntry._Monitor.Log($"Chest not found above", LogLevel.Debug);
                 return false;
             }
             if (!environment.objects.TryGetValue(this.TileLocation + GetFromChestVector(), out SObject objTo) || !(objTo is Chest chestTo))
             {
-                ModEntry._Monitor.Log($"Chest not found Bellow", LogLevel.Debug);
-
                 return false;
             }
-            ModEntry._Monitor.Log($"Chests found", LogLevel.Debug);
+
             chestFrom.clearNulls();
             for (int i = 0; i < minutes; i++)
             {
@@ -125,7 +112,7 @@ namespace ExampleMod1
                     for (int itemCount = 0; itemCount < WhiteListItems.Count; itemCount++)
                     {
                         Item whiteListItem = WhiteListItems[itemCount];
-                        if (itemOne.canStackWith(whiteListItem) || itemOne.ParentSheetIndex == whiteListItem.ParentSheetIndex)
+                        if (itemOne.canStackWith(whiteListItem) || (itemOne.ParentSheetIndex == whiteListItem.ParentSheetIndex && (item as SObject).quality.Value == (whiteListItem as SObject).quality.Value))
                         {
                             canMoveItem = true;
                             break;
@@ -178,38 +165,9 @@ namespace ExampleMod1
             return FromDirection;
         }
 
-        ///// <summary>Called after a machine updates on time change.</summary>
-        ///// <param name="machine">The machine that updated.</param>
-        ///// <param name="location">The location containing the machine.</param>
-        //private void OnMachineMinutesElapsed(SObject machine, GameLocation location)
-        //{
-        //    // not super hopper
-        //    if (!this.TryGetHopper(machine, out Chest hopper) || hopper.heldObject.Value == null || !Utility.IsNormalObjectAtParentSheetIndex(hopper.heldObject.Value, SObject.iridiumBar))
-        //        return;
-
-        //    // fix flag if needed
-        //    if (!hopper.modData.ContainsKey(this.ModDataFlag))
-        //        hopper.modData[this.ModDataFlag] = "1";
-
-        //    // no chests to transfer
-            //if (!location.objects.TryGetValue(hopper.TileLocation - new Vector2(0, 1), out SObject objAbove) || objAbove is not Chest chestAbove)
-            //    return;
-            //if (!location.objects.TryGetValue(hopper.TileLocation + new Vector2(0, 1), out SObject objBelow) || objBelow is not Chest chestBelow)
-            //    return;
-
-        //    // transfer items
-        //    chestAbove.clearNulls();
-        //    for (int i = chestAbove.items.Count - 1; i >= 0; i--)
-        //    {
-        //        Item item = chestAbove.items[i];
-        //        if (chestBelow.addItem(item) == null)
-        //            chestAbove.items.RemoveAt(i);
-        //    }
-        //}
-
         public override string getDescription()
         {
-            return "This is a test description";
+            return "This inserter moves items from one chest to another!";
         }
 
         public override bool canStackWith(ISalable other)
@@ -233,10 +191,8 @@ namespace ExampleMod1
 
         public override bool performToolAction(Tool t, GameLocation location)
         {
-            ModEntry._Monitor.Log($"perform Tool Action", LogLevel.Debug);
             if (t == null)
             {
-
                 return false;
             }
 
@@ -253,11 +209,6 @@ namespace ExampleMod1
             return false;
         }
 
-        //public override bool clicked(Farmer who)
-        //{
-        //    ModEntry._Monitor.Log($"clicked", LogLevel.Debug);
-        //    return base.clicked(who);
-        //}
         public override bool checkForAction(Farmer who, bool justCheckingForActivity = false)
         {
             if (justCheckingForActivity)
@@ -269,7 +220,6 @@ namespace ExampleMod1
                 return false;
             }
 
-            //Game1.activeClickableMenu = new ItemGrabMenu((heldObject.Value as Chest).items, reverseGrab: false, showReceivingMenu: true, InventoryMenu.highlightAllItems, (heldObject.Value as Chest).grabItemFromInventory, null, grabItemFromAutoGrabber, snapToBottom: false, canBeExitedWithKey: true, playRightClickSound: true, allowRightClick: true, showOrganizeButton: true, 1, null, -1, this);
             Game1.activeClickableMenu = new InserterCustomUI(this);
             return true;
         }
@@ -301,12 +251,6 @@ namespace ExampleMod1
             Vector2 scaleFactor = this.getScale();
             scaleFactor *= Game1.pixelZoom;
             Vector2 position = Game1.GlobalToLocal(Game1.viewport, new Vector2(xNonTile, yNonTile));
-            //Rectangle destination = new Rectangle(
-            //    x: (int)(position.X - scaleFactor.X / 2f) + ((this.shakeTimer > 0) ? Game1.random.Next(-1, 2) : 0),
-            //    y: (int)(position.Y - scaleFactor.Y / 2f) + ((this.shakeTimer > 0) ? Game1.random.Next(-1, 2) : 0),
-            //    width: (int)(Game1.tileSize + scaleFactor.X),
-            //    height: (int)((Game1.tileSize * 2) + scaleFactor.Y / 2f)
-            //);
             Rectangle destination = new Rectangle(
                 x: (int)(position.X - scaleFactor.X / 2f),
                 y: (int)(position.Y - scaleFactor.Y / 2f),
@@ -314,12 +258,10 @@ namespace ExampleMod1
                 height: (int)((Game1.tileSize * 2) + scaleFactor.Y / 2f)
             );
             spriteBatch.Draw(tex, destination, null, Color.White * alpha, 0f, Vector2.Zero, SpriteEffects.None, layerDepth);
-            //spriteBatch.Draw(tex, destination, null, Color.White * alpha, 0f, Vector2.Zero, SpriteEffects.None, layerDepth);
         }
 
         public override void draw(SpriteBatch spriteBatch, int x, int y, float alpha = 1)
         {
-            // draw mannequin
             float drawLayer = Math.Max(0f, ((y + 1) * 64 - 24) / 10000f) + x * 1E-05f;
             this.draw(spriteBatch, xNonTile: x * Game1.tileSize, yNonTile: y * Game1.tileSize - Game1.tileSize, layerDepth: drawLayer, alpha: alpha);
         }

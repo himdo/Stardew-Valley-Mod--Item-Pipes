@@ -11,6 +11,7 @@ using SpaceCore.Framework;
 //using CustomCraftingRecipeFramework = SpaceCore.Framework.CustomCraftingRecipe;
 using CustomCraftingRecipeCore = SpaceCore.CustomCraftingRecipe;
 using System.Collections.Generic;
+using StardewValley.Menus;
 
 namespace ExampleMod1
 {
@@ -35,9 +36,8 @@ namespace ExampleMod1
         {
             ModEntry.Instance = this;
             ModEntry._Monitor = this.Monitor;
-            helper.Events.Input.ButtonPressed += this.OnButtonPressed;
             helper.Events.GameLoop.GameLaunched += this.GameLaunchedHandler;
-            helper.Events.GameLoop.DayStarted += this.GameLoop_DayStarted;
+            helper.Events.Display.MenuChanged += this.OnMenuChanged;
             //helper.Events.Content.AssetRequested += this.OnAssetRequested;
 
         }
@@ -60,6 +60,24 @@ namespace ExampleMod1
 
             //CraftingRecipe.craftingRecipes = content.Load<Dictionary<string, string>>("Data\\CraftingRecipes");
         }
+
+
+        /// <inheritdoc cref="IDisplayEvents.MenuChanged"/>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event arguments.</param>
+        private void OnMenuChanged(object sender, MenuChangedEventArgs e)
+        {
+            if (e.NewMenu is ShopMenu shop)
+            {
+                if (shop.portraitPerson?.Name == "Robin")
+                {
+                    var inserter = new InserterObject(Vector2.Zero);
+                    shop.forSale.Add(inserter);
+                    shop.itemPriceAndStock.Add(inserter, new[] { 1500, int.MaxValue });
+                }
+            }
+        }
+
 
         //private void OnAssetRequested(object sender, AssetRequestedEventArgs e)
         //{
@@ -108,49 +126,33 @@ namespace ExampleMod1
         //}
 
 
-        private void GameLoop_DayStarted(object sender, DayStartedEventArgs e)
-        {
-            _Monitor.Log($"${Game1.player.craftingRecipes}", LogLevel.Debug);
-            foreach (string key in Game1.player.craftingRecipes.Keys)
-            {
-                _Monitor.Log($"${key}", LogLevel.Debug);
-            }
-            _Monitor.Log($"Adding Recipe to {Game1.player.Name}.", LogLevel.Debug);
-            // TODO Figure out why this doesn't work
-            string RecipeName = "Inserter";
-            //string RecipeName = "Stone Chest";
-            bool isAlreadyKnown = Game1.player.craftingRecipes.ContainsKey(RecipeName);
-            if (!isAlreadyKnown)
-            {
-                Game1.player.craftingRecipes.Add(RecipeName, 0);
-            }
-            _Monitor.Log($"Finished Adding Recipe to {Game1.player.Name}.", LogLevel.Debug);
-            foreach (string key in Game1.player.craftingRecipes.Keys)
-            {
-                _Monitor.Log($"${key}", LogLevel.Debug);
-            }
-
-            foreach (string key in Game1.player.craftingRecipes.Keys)
-            {
-                _Monitor.Log($"${key}", LogLevel.Debug);
-            }
-        }
+        //private void GameLoop_DayStarted(object sender, DayStartedEventArgs e)
+        //{
+        // TODO Figure out why this doesn't work
+        //string RecipeName = "Inserter";
+        //string RecipeName = "Stone Chest";
+        //bool isAlreadyKnown = Game1.player.craftingRecipes.ContainsKey(RecipeName);
+        //if (!isAlreadyKnown)
+        //{
+        //    Game1.player.craftingRecipes.Add(RecipeName, 0);
+        //}
+        //}
 
 
-        /// <summary>Raised after the player presses a button on the keyboard, controller, or mouse.</summary>
-        /// <param name="sender">The event sender.</param>
-        /// <param name="e">The event data.</param>
-        private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
-        {
-            // ignore if player hasn't loaded a save yet
-            if (!Context.IsWorldReady)
-                return;
-            if (e.Button.ToString().ToLower() == "n")
-            {
-                Game1.player.addItemToInventory(new InserterObject(Vector2.Zero));
-            }
-            // print button presses to the console window
-            _Monitor.Log($"{Game1.player.Name} pressed {e.Button}.", LogLevel.Debug);
-        }
+        ///// <summary>Raised after the player presses a button on the keyboard, controller, or mouse.</summary>
+        ///// <param name="sender">The event sender.</param>
+        ///// <param name="e">The event data.</param>
+        //private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
+        //{
+        //    // ignore if player hasn't loaded a save yet
+        //    if (!Context.IsWorldReady)
+        //        return;
+        //    if (e.Button.ToString().ToLower() == "n")
+        //    {
+        //        Game1.player.addItemToInventory(new InserterObject(Vector2.Zero));
+        //    }
+        //    // print button presses to the console window
+        //    _Monitor.Log($"{Game1.player.Name} pressed {e.Button}.", LogLevel.Debug);
+        //}
     }
 }
