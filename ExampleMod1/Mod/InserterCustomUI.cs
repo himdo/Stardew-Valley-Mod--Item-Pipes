@@ -128,23 +128,12 @@ namespace ExampleMod1.InserterUI
                 LocalPosition = new Vector2(width/2 - 120, 10),
             };
 
-            //var itemSlot = new ItemSlot()
-            //{
-            //    LocalPosition = new Vector2(150, height / 2 - 50 + heightOffset),
-            //    Callback = (e) => AddItem((ItemSlot) e),
-            //};
-            ////itemSlot.ItemDisplay
-            //ui.AddChild(itemSlot);
             if (this.inserterInstance != null)
             {
                 List<Element> rowSlots = new List<Element>();
                 int numberOfSlotsPerRow = 5;
                 for (int i = 0; i < inserterInstance.WhiteListItems.Count + 1; i++)
                 {
-                    //if (i + 1 % numberOfSlotsPerRow == 0)
-                    //{
-                        //table.AddRow(rowSlots.ToArray());
-                //}
                 var itemSlot = new ItemSlot()
                     {
                         LocalPosition = new Vector2(10 + (100*(i% numberOfSlotsPerRow)), 150 * ((int)(Math.Ceiling((float) (i+1)/numberOfSlotsPerRow)))),
@@ -163,22 +152,6 @@ namespace ExampleMod1.InserterUI
                             table.AddRow(new Element[0]);
                         rowSlots = new List<Element>();
                     }
-
-                    //itemSlot.ItemDisplay
-                    //ui.AddChild(itemSlot);
-                    //List<Element> rowSlots = new List<Element>();
-                    ////table.AddRow(rowSlots.ToArray());
-                    //var rowElement = new Label()
-                    //{
-                    //    String = $"This is a table Item ${i}",
-                    //    Bold = false,
-                    //};
-                    //rowElement.LocalPosition = new Vector2(10, 150 * (1 + i));
-                    //rowSlots.Add(rowElement);
-                    //table.AddRow(rowSlots.ToArray());
-                    //// This appears to only put blank spaces
-                    //for (int j = 0; j < 2; ++j)
-                    //    table.AddRow(new Element[0]);
                 }
                 if (rowSlots.Count > 0)
                 {
@@ -270,9 +243,18 @@ namespace ExampleMod1.InserterUI
             }
             else
             {
-                if (!inserterInstance.WhiteListItems.Contains(base.heldItem))
+                bool foundCopy = false;
+                for (int i = 0; i < inserterInstance.WhiteListItems.Count; i++)
                 {
-                    inserterInstance.WhiteListItems.Add(base.heldItem);
+                    if (inserterInstance.WhiteListItems[i].ParentSheetIndex == base.heldItem.ParentSheetIndex && (inserterInstance.WhiteListItems[i] as SObject).quality.Value == (base.heldItem as SObject).quality.Value)
+                    {
+                        foundCopy = true;
+                        break;
+                    }
+                }
+                if (foundCopy == false)
+                {
+                    inserterInstance.WhiteListItems.Add(base.heldItem.getOne());
                     e.ItemDisplay = base.heldItem.getOne();
                     ReCreateUI();
 
