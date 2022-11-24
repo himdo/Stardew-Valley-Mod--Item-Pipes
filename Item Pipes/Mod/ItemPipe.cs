@@ -12,6 +12,7 @@ using SObject = StardewValley.Object;
 using System.Collections.Generic;
 using StardewModdingAPI;
 using ItemPipes.ItemPipeUI;
+using StardewValley.Network;
 
 namespace ItemPipes.ItemPipeObject
 {
@@ -32,8 +33,17 @@ namespace ItemPipes.ItemPipeObject
         ** Fields
         *********/
         private Texture2D Tex = ModEntry.Instance.Helper.ModContent.Load<Texture2D>("assets/PipeUpToDown.png");
-        public readonly NetInt FacingDirection = new NetInt((int)Directions.NorthToSouth);
-        public List<Item> WhiteListItems = new List<Item>();
+        public NetInt FacingDirection = new NetInt((int)Directions.NorthToSouth);
+        public NetList<Item, NetRef<Item>> WhiteListItems = new NetList<Item, NetRef<Item>>();
+
+        //public NetInt FacingDirection1
+        //{
+        //    get { return (NetInt)FacingDirection; }
+        //    set
+        //    {
+        //        (NetInt)FacingDirection = value;
+        //    }
+        //}// = new NetInt((int)Directions.NorthToSouth);
 
 
         /*********
@@ -291,7 +301,7 @@ namespace ItemPipes.ItemPipeObject
         protected override void initNetFields()
         {
             base.initNetFields();
-            this.NetFields.AddFields(this.FacingDirection);
+            this.NetFields.AddFields(this.FacingDirection, this.WhiteListItems);
 
             this.FacingDirection.fieldChangeEvent += this.OnNetFieldChanged;
         }
@@ -299,7 +309,8 @@ namespace ItemPipes.ItemPipeObject
         private void OnNetFieldChanged<TNetField, TValue>(TNetField field, TValue oldValue, TValue newValue)
         {
             //this.FarmerForRenderingCache = null;
-            //ModEntry._Monitor.Log($"${field} changed from ${oldValue}, to ${newValue}",LogLevel.Debug);
+            ModEntry._Monitor.Log($"${field} changed from ${oldValue}, to ${newValue}, Faceing Direction: ${this.FacingDirection}",LogLevel.Debug);
+            this.FacingDirection.Set(Convert.ToInt32(newValue));
             this.SetTextureForDirection();
         }
         protected override string loadDisplayName()
@@ -314,7 +325,12 @@ namespace ItemPipes.ItemPipeObject
         }
         public void ChangeDirection(Directions newDirection)
         {
-            this.FacingDirection.Set((int) newDirection);
+            this.ChangeDirection((int)newDirection);
+        }
+
+        public void ChangeDirection(int newDirection)
+        {
+            this.FacingDirection.Set(newDirection);
             this.SetTextureForDirection();
         }
         private void SetTextureForDirection()
