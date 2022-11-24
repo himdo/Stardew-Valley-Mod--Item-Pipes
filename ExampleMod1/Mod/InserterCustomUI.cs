@@ -186,6 +186,26 @@ namespace ExampleMod1.InserterUI
                 base.heldItem.drawInMenu(b, new Vector2(Game1.getOldMouseX() + 8, Game1.getOldMouseY() + 8), 1f);
             }
 
+            if (ItemWithBorder.HoveredElement != null)
+            {
+                if (ItemWithBorder.HoveredElement is ItemSlot slot && slot.Item != null)
+                {
+                    drawToolTip(b, slot.Item.getDescription(), slot.Item.DisplayName, slot.Item);
+                }
+                else if (ItemWithBorder.HoveredElement.ItemDisplay != null)
+                {
+                    drawToolTip(b, ItemWithBorder.HoveredElement.ItemDisplay.getDescription(), ItemWithBorder.HoveredElement.ItemDisplay.DisplayName, ItemWithBorder.HoveredElement.ItemDisplay);
+                }
+            }
+            else
+            {
+                var hover = base.inventory.hover(Game1.getMouseX(), Game1.getMouseY(), null);
+                if (hover != null)
+                {
+                    drawToolTip(b, base.inventory.hoverText, base.inventory.hoverTitle, hover);
+                }
+            }
+
             drawMouse(b);
         }
 
