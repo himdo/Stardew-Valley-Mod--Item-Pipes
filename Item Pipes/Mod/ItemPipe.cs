@@ -35,6 +35,7 @@ namespace ItemPipes.ItemPipeObject
         private Texture2D Tex = ModEntry.Instance.Helper.ModContent.Load<Texture2D>("assets/PipeUpToDown.png");
         public NetInt FacingDirection = new NetInt((int)Directions.NorthToSouth);
         public NetList<Item, NetRef<Item>> WhiteListItems = new NetList<Item, NetRef<Item>>();
+        public NetBool UIOpened = new NetBool(false);
 
         //public NetInt FacingDirection1
         //{
@@ -234,8 +235,11 @@ namespace ItemPipes.ItemPipeObject
             {
                 return false;
             }
-
-            Game1.activeClickableMenu = new ItemPipeCustomUI(this);
+            if (UIOpened == false)
+            {
+                Game1.activeClickableMenu = new ItemPipeCustomUI(this);
+                UIOpened.Set(true);
+            }
             return true;
         }
         
@@ -301,7 +305,7 @@ namespace ItemPipes.ItemPipeObject
         protected override void initNetFields()
         {
             base.initNetFields();
-            this.NetFields.AddFields(this.FacingDirection, this.WhiteListItems);
+            this.NetFields.AddFields(this.FacingDirection, this.WhiteListItems, this.UIOpened);
 
             this.FacingDirection.fieldChangeEvent += this.OnNetFieldChanged;
         }

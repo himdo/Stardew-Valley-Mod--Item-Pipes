@@ -26,7 +26,6 @@ namespace ItemPipes.ItemPipeUI
         private Table table;
         private ItemPipe itemPipeInstance;
         private int heightOffset = -120;
-        // TODO if you close the UI with an item in your hand it will delete the item FIXME
 
         public ItemPipeCustomUI() : base(null, okButton: false, trashCan: false, 0,0)//12, 132)//: base((Game1.uiViewport.Width - 900) / 2, (Game1.uiViewport.Height - (Game1.uiViewport.Height - 100)) / 2, 900, (Game1.uiViewport.Height - 100))
         {
@@ -220,6 +219,7 @@ namespace ItemPipes.ItemPipeUI
                 Game1.player.addItemToInventory(base.heldItem);
                 //base.heldItem = null;
             }
+            itemPipeInstance.UIOpened.Set(false);
             base.cleanupBeforeExit();
         }
         public override void receiveKeyPress(Keys key)
