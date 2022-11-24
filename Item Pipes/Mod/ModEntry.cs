@@ -1,4 +1,4 @@
-﻿using ItemPipes.Inserter;
+﻿using ItemPipes.ItemPipeObject;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SpaceShared;
@@ -53,10 +53,10 @@ namespace ItemPipes
             //_Monitor.Log($"ModEntry.Ja is INIT", LogLevel.Debug);
 
             var sc = this.Helper.ModRegistry.GetApi<ISpaceCoreApi>("spacechase0.SpaceCore");
-            sc.RegisterSerializerType(typeof(InserterObject));
-            //customCraftingRecipes.Add(new InserterRecipe());
-            //CustomCraftingRecipeCore.CraftingRecipes.Add("Inserter", new InserterRecipe());
-            //CustomCraftingRecipeCore.CraftingRecipes.Add("Inserter", new CustomCraftingRecipe("Inserter", false,new InserterRecipe()));
+            sc.RegisterSerializerType(typeof(ItemPipe));
+            //customCraftingRecipes.Add(new PipeRecipe());
+            //CustomCraftingRecipeCore.CraftingRecipes.Add("Pipe", new PipeRecipe());
+            //CustomCraftingRecipeCore.CraftingRecipes.Add("Pipe", new CustomCraftingRecipe("Pipe", false,new PipeRecipe()));
 
             //CraftingRecipe.craftingRecipes = content.Load<Dictionary<string, string>>("Data\\CraftingRecipes");
         }
@@ -75,10 +75,10 @@ namespace ItemPipes
                 var forSale = menu.forSale;
                 var itemPriceAndStock = menu.itemPriceAndStock;
 
-                Item inserter = new InserterObject(Vector2.Zero);
-                forSale.Add(inserter);
-                itemPriceAndStock.Add(inserter, new[] { 
-                    100,            // Price
+                Item ItemPipe = new ItemPipe(Vector2.Zero);
+                forSale.Add(ItemPipe);
+                itemPriceAndStock.Add(ItemPipe, new[] { 
+                    1500,            // Price
                     int.MaxValue    // Quantity
                 });
             }
@@ -94,7 +94,7 @@ namespace ItemPipes
         //        return;
         //    if (e.Button.ToString().ToLower() == "n")
         //    {
-        //        Game1.player.addItemByMenuIfNecessary(new InserterObject(Vector2.Zero));
+        //        Game1.player.addItemByMenuIfNecessary(new ItemPipe(Vector2.Zero));
         //    } else if (e.Button.ToString().ToLower() == "b")
         //    {
         //        for (int i = 0; i < (int)Game1.player.maxItems; i++)
@@ -128,20 +128,20 @@ namespace ItemPipes
 
         //        //    _Monitor.Log($" e.Edit(asset: ${dict}", LogLevel.Debug);
         //        //    //dict.Add($"0 1/meow/0 1/true/{null} {0}/asdsad");
-        //        //    //dict.Add("Inserter", $"{InserterObject} 5/Field/434/false/null/Inserter");
-        //        //    //dict.Add("Inserter Recipe", $"{ModEntry.Ja.GetInserterObjectId("Frosty Stardrop Piece")} 5/Field/434/false/null/{I18n.Recipe_FrostyStardrop_Name()}");
+        //        //    //dict.Add("ItemPipe", $"{ItemPipe} 5/Field/434/false/null/ItemPipe");
+        //        //    //dict.Add("ItemPipe Recipe", $"{ModEntry.Ja.GetItemPipeId("Frosty Stardrop Piece")} 5/Field/434/false/null/{I18n.Recipe_FrostyStardrop_Name()}");
 
         //        //});
 
         //        e.Edit((asset) =>
         //        {
-        //            CraftingRecipePackData test = new InserterRecipe2();
+        //            CraftingRecipePackData test = new PipeRecipe2();
 
         //            var crecipe = new DGACustomCraftingRecipe(test);
         //            _Monitor.Log($"e.NameWithoutLocale.IsEquivalentTo: ${crecipe.data.CraftingDataKey}", LogLevel.Debug);
         //            var dict = asset.AsDictionary<string, string>().Data;
         //            dict.Add(crecipe.data.CraftingDataKey, crecipe.data.CraftingDataValue);
-        //            //dict.Add(new CustomCraftingRecipeFramework("Inserter",false,null);
+        //            //dict.Add(new CustomCraftingRecipeFramework("Pipe",false,null);
 
         //            //var dict = asset.AsDictionary<string, string>().Data;
         //            //int i = 0;
@@ -164,7 +164,7 @@ namespace ItemPipes
         //private void GameLoop_DayStarted(object sender, DayStartedEventArgs e)
         //{
         // TODO Figure out why this doesn't work
-        //string RecipeName = "Inserter";
+        //string RecipeName = "Pipe";
         //string RecipeName = "Stone Chest";
         //bool isAlreadyKnown = Game1.player.craftingRecipes.ContainsKey(RecipeName);
         //if (!isAlreadyKnown)

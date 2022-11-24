@@ -47,8 +47,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Mod\Inserter.cs" />
-    <Compile Include="Mod\InserterCustomUI.cs" />
+    <Compile Include="Mod\ItemPipe.cs" />
+    <Compile Include="Mod\ItemPipeCustomUI.cs" />
     <Compile Include="Mod\ModEntry.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -59,16 +59,16 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Assets\InserterDownToUp.png">
+    <Content Include="Assets\PipeDownToUp.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\InserterLeftToRight.png">
+    <Content Include="Assets\PipeLeftToRight.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\InserterRightToLeft.png">
+    <Content Include="Assets\PipeRightToLeft.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\InserterUpToDown.png">
+    <Content Include="Assets\PipeUpToDown.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

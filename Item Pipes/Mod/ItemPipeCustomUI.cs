@@ -16,19 +16,19 @@ using StardewValley.Objects;
 using StardewValley.Tools;
 using System.Xml.Linq;
 using SObject = StardewValley.Object;
-using ItemPipes.Inserter;
+using ItemPipes.ItemPipeObject;
 
-namespace ItemPipes.InserterUI
+namespace ItemPipes.ItemPipeUI
 {
-    public class InserterCustomUI : MenuWithInventory
+    public class ItemPipeCustomUI : MenuWithInventory
     {
         private RootElement ui;
         private Table table;
-        private InserterObject inserterInstance;
+        private ItemPipe itemPipeInstance;
         private int heightOffset = -120;
         // TODO if you close the UI with an item in your hand it will delete the item FIXME
 
-        public InserterCustomUI() : base(null, okButton: false, trashCan: false, 0,0)//12, 132)//: base((Game1.uiViewport.Width - 900) / 2, (Game1.uiViewport.Height - (Game1.uiViewport.Height - 100)) / 2, 900, (Game1.uiViewport.Height - 100))
+        public ItemPipeCustomUI() : base(null, okButton: false, trashCan: false, 0,0)//12, 132)//: base((Game1.uiViewport.Width - 900) / 2, (Game1.uiViewport.Height - (Game1.uiViewport.Height - 100)) / 2, 900, (Game1.uiViewport.Height - 100))
         {
 
             //int num2 = 0;
@@ -46,7 +46,7 @@ namespace ItemPipes.InserterUI
 
             var title = new Label()
             {
-                String = "Inserter Configuration",
+                String = "Pipe Configuration",
                 Bold = true,
             };
             title.LocalPosition = new Vector2((width - title.Width) / 2, 10 + heightOffset);
@@ -67,8 +67,8 @@ namespace ItemPipes.InserterUI
             {
                 String = "Up",
                 //String = "↑",
-                Bold = this.inserterInstance != null ? (int)this.inserterInstance.FacingDirection == (int)Directions.SouthToNorth : false,
-                Callback = (e) => SetInserterDirection(Directions.SouthToNorth),
+                Bold = this.itemPipeInstance != null ? (int)this.itemPipeInstance.FacingDirection == (int)Directions.SouthToNorth : false,
+                Callback = (e) => SetPipeDirection(Directions.SouthToNorth),
             };
             SouthToNorth.LocalPosition = new Vector2((width - SouthToNorth.Width) / 2 - moveOverConstant, 150 + heightOffset);
             ui.AddChild(SouthToNorth);
@@ -77,8 +77,8 @@ namespace ItemPipes.InserterUI
             {
                 String = "Left",
                 //String = "→",
-                Bold = this.inserterInstance != null ? (int)this.inserterInstance.FacingDirection == (int)Directions.EastToWest : false,
-                Callback = (e) => SetInserterDirection(Directions.EastToWest),
+                Bold = this.itemPipeInstance != null ? (int)this.itemPipeInstance.FacingDirection == (int)Directions.EastToWest : false,
+                Callback = (e) => SetPipeDirection(Directions.EastToWest),
             };
             EastToWest.LocalPosition = new Vector2((width - EastToWest.Width) / 2 - 70 - moveOverConstant, 200 + heightOffset);
             ui.AddChild(EastToWest);
@@ -86,8 +86,8 @@ namespace ItemPipes.InserterUI
             {
                 String = "Right",
                 //String = "←",
-                Bold = this.inserterInstance != null ? (int)this.inserterInstance.FacingDirection == (int)Directions.WestToEast : false,
-                Callback = (e) => SetInserterDirection(Directions.WestToEast),
+                Bold = this.itemPipeInstance != null ? (int)this.itemPipeInstance.FacingDirection == (int)Directions.WestToEast : false,
+                Callback = (e) => SetPipeDirection(Directions.WestToEast),
             };
             WestToEast.LocalPosition = new Vector2((width - WestToEast.Width) / 2 + 70 - moveOverConstant, 200 + heightOffset);
             ui.AddChild(WestToEast);
@@ -97,8 +97,8 @@ namespace ItemPipes.InserterUI
 
                 String = "Down",
                 //String = "↓",
-                Bold = this.inserterInstance != null ? (int)this.inserterInstance.FacingDirection == (int)Directions.NorthToSouth : false,
-                Callback = (e) => SetInserterDirection(Directions.NorthToSouth),
+                Bold = this.itemPipeInstance != null ? (int)this.itemPipeInstance.FacingDirection == (int)Directions.NorthToSouth : false,
+                Callback = (e) => SetPipeDirection(Directions.NorthToSouth),
             };
             NorthToSouth.LocalPosition = new Vector2((width - NorthToSouth.Width) / 2 - moveOverConstant, 250 + heightOffset);
             ui.AddChild(NorthToSouth);
@@ -128,20 +128,20 @@ namespace ItemPipes.InserterUI
                 LocalPosition = new Vector2(width/2 - 120, 10),
             };
 
-            if (this.inserterInstance != null)
+            if (this.itemPipeInstance != null)
             {
                 List<Element> rowSlots = new List<Element>();
                 int numberOfSlotsPerRow = 5;
-                for (int i = 0; i < inserterInstance.WhiteListItems.Count + 1; i++)
+                for (int i = 0; i < itemPipeInstance.WhiteListItems.Count + 1; i++)
                 {
                     var itemSlot = new ItemSlot()
                     {
                         LocalPosition = new Vector2(10 + (100*(i% numberOfSlotsPerRow)), 150 * ((int)(Math.Ceiling((float) (i+1)/numberOfSlotsPerRow)))),
                         Callback = (e) => AddItem((ItemSlot)e),
                     };
-                    if (i < inserterInstance.WhiteListItems.Count)
+                    if (i < itemPipeInstance.WhiteListItems.Count)
                     {
-                        itemSlot.ItemDisplay = inserterInstance.WhiteListItems[i];
+                        itemSlot.ItemDisplay = itemPipeInstance.WhiteListItems[i];
                     }
                     rowSlots.Add(itemSlot);
                     if ((i+1)% numberOfSlotsPerRow == 0)
@@ -168,9 +168,9 @@ namespace ItemPipes.InserterUI
 
         }
 
-        public InserterCustomUI(InserterObject instance): this()
+        public ItemPipeCustomUI(ItemPipe instance): this()
         {
-            inserterInstance = instance;
+            itemPipeInstance = instance;
             ReCreateUI();
 
         }
@@ -235,11 +235,11 @@ namespace ItemPipes.InserterUI
             this.exitThisMenuNoSound();
         }
 
-        private void SetInserterDirection(Directions direction)
+        private void SetPipeDirection(Directions direction)
         {
-            if (this.inserterInstance != null)
+            if (this.itemPipeInstance != null)
             {
-                this.inserterInstance.ChangeDirection(direction);
+                this.itemPipeInstance.ChangeDirection(direction);
                 ReCreateUI();
             }
         }
@@ -257,16 +257,16 @@ namespace ItemPipes.InserterUI
         {
             if (base.heldItem == null)
             {
-                inserterInstance.WhiteListItems.Remove(e.ItemDisplay);
+                itemPipeInstance.WhiteListItems.Remove(e.ItemDisplay);
                 e.ItemDisplay = null;
                 ReCreateUI();
             }
             else
             {
                 bool foundCopy = false;
-                for (int i = 0; i < inserterInstance.WhiteListItems.Count; i++)
+                for (int i = 0; i < itemPipeInstance.WhiteListItems.Count; i++)
                 {
-                    if (inserterInstance.WhiteListItems[i].ParentSheetIndex == base.heldItem.ParentSheetIndex && (inserterInstance.WhiteListItems[i] as SObject).quality.Value == (base.heldItem as SObject).quality.Value)
+                    if (itemPipeInstance.WhiteListItems[i].ParentSheetIndex == base.heldItem.ParentSheetIndex && (itemPipeInstance.WhiteListItems[i] as SObject).quality.Value == (base.heldItem as SObject).quality.Value)
                     {
                         foundCopy = true;
                         break;
@@ -274,7 +274,7 @@ namespace ItemPipes.InserterUI
                 }
                 if (foundCopy == false)
                 {
-                    inserterInstance.WhiteListItems.Add(base.heldItem.getOne());
+                    itemPipeInstance.WhiteListItems.Add(base.heldItem.getOne());
                     e.ItemDisplay = base.heldItem.getOne();
                     ReCreateUI();
 

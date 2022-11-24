@@ -11,9 +11,9 @@ using SObject = StardewValley.Object;
 
 using System.Collections.Generic;
 using StardewModdingAPI;
-using ItemPipes.InserterUI;
+using ItemPipes.ItemPipeUI;
 
-namespace ItemPipes.Inserter
+namespace ItemPipes.ItemPipeObject
 {
 
     public enum Directions
@@ -25,13 +25,13 @@ namespace ItemPipes.Inserter
     }
 
 
-    [XmlType("Mods_himdo_Inserter")]
-    public class InserterObject : SObject // must be public for the XML serializer
+    [XmlType("Mods_himdo_ItemPipe")]
+    public class ItemPipe : SObject // must be public for the XML serializer
     {
         /*********
         ** Fields
         *********/
-        private Texture2D Tex = ModEntry.Instance.Helper.ModContent.Load<Texture2D>("assets/InserterUpToDown.png");
+        private Texture2D Tex = ModEntry.Instance.Helper.ModContent.Load<Texture2D>("assets/PipeUpToDown.png");
         public readonly NetInt FacingDirection = new NetInt((int)Directions.NorthToSouth);
         public List<Item> WhiteListItems = new List<Item>();
 
@@ -49,9 +49,9 @@ namespace ItemPipes.Inserter
         /*********
         ** Public methods
         *********/
-        public InserterObject() { }
+        public ItemPipe() { }
 
-        public InserterObject(Vector2 placement)
+        public ItemPipe(Vector2 placement)
         {
             this.name = this.loadDisplayName();
             this.DisplayName = this.loadDisplayName();
@@ -63,7 +63,7 @@ namespace ItemPipes.Inserter
             this.boundingBox.Value = new Rectangle((int)placement.X * 64, (int)placement.Y * 64, 64, 64);
         }
 
-        public InserterObject(Directions direction, Vector2 placement)
+        public ItemPipe(Directions direction, Vector2 placement)
         {
             this.name = this.loadDisplayName();
             this.DisplayName = this.loadDisplayName();
@@ -98,7 +98,7 @@ namespace ItemPipes.Inserter
 
         public override Item getOne()
         {
-            var ret = new InserterObject( Vector2.Zero);
+            var ret = new ItemPipe( Vector2.Zero);
             ret._GetOneFrom(this);
             return ret;
         }
@@ -171,12 +171,12 @@ namespace ItemPipes.Inserter
 
         public override string getDescription()
         {
-            return "This inserter moves items from one chest to another!";
+            return "This Pipe moves items from one chest to another!";
         }
 
         public override bool canStackWith(ISalable other)
         {
-            return other is InserterObject;
+            return other is ItemPipe;
         }
 
         public override bool isPlaceable()
@@ -187,7 +187,7 @@ namespace ItemPipes.Inserter
         public override bool placementAction(GameLocation location, int x, int y, Farmer who = null)
         {
             Vector2 placementTile = new Vector2(x / Game1.tileSize, y / Game1.tileSize);
-            var i = new InserterObject(placementTile);
+            var i = new ItemPipe(placementTile);
             location.Objects.Add(placementTile, i);
             location.playSound("woodyStep");
             return true;
@@ -207,7 +207,7 @@ namespace ItemPipes.Inserter
 
                 
             location.objects.Remove(this.TileLocation);
-            this.DropItem(location, new InserterObject(Vector2.Zero));
+            this.DropItem(location, new ItemPipe(Vector2.Zero));
             location.playSound("woodyStep");
 
             return false;
@@ -225,7 +225,7 @@ namespace ItemPipes.Inserter
                 return false;
             }
 
-            Game1.activeClickableMenu = new InserterCustomUI(this);
+            Game1.activeClickableMenu = new ItemPipeCustomUI(this);
             return true;
         }
         
@@ -272,7 +272,7 @@ namespace ItemPipes.Inserter
         }
         public static string GetNameFromVariantKey(string variantKey)
         {
-            return "Inserter";
+            return "Item Pipe";
         }
 
         /// <summary>Drop an item onto the ground near the mannequin.</summary>
@@ -304,7 +304,7 @@ namespace ItemPipes.Inserter
         }
         protected override string loadDisplayName()
         {
-            return "Inserter";
+            return "Item Pipe";
         }
 
         /// <summary>Get the main mannequin texture to render.</summary>
@@ -322,16 +322,16 @@ namespace ItemPipes.Inserter
             switch (this.FacingDirection)
             {
                 case (int)Directions.NorthToSouth:
-                    Tex = ModEntry.Instance.Helper.ModContent.Load<Texture2D>("assets/InserterUpToDown.png");
+                    Tex = ModEntry.Instance.Helper.ModContent.Load<Texture2D>("assets/PipeUpToDown.png");
                     break;
                 case (int)Directions.SouthToNorth:
-                    Tex = ModEntry.Instance.Helper.ModContent.Load<Texture2D>("assets/InserterDownToUp.png");
+                    Tex = ModEntry.Instance.Helper.ModContent.Load<Texture2D>("assets/PipeDownToUp.png");
                     break;
                 case (int)Directions.EastToWest:
-                    Tex = ModEntry.Instance.Helper.ModContent.Load<Texture2D>("assets/InserterRightToLeft.png");
+                    Tex = ModEntry.Instance.Helper.ModContent.Load<Texture2D>("assets/PipeRightToLeft.png");
                     break;
                 case (int)Directions.WestToEast:
-                    Tex = ModEntry.Instance.Helper.ModContent.Load<Texture2D>("assets/InserterLeftToRight.png");
+                    Tex = ModEntry.Instance.Helper.ModContent.Load<Texture2D>("assets/PipeLeftToRight.png");
                     break;
                 default:
                     break;
@@ -339,34 +339,34 @@ namespace ItemPipes.Inserter
         }
     }
 
-    //public class InserterRecipe : CustomCraftingRecipe // must be public for the XML serializer
+    //public class PipeRecipe : CustomCraftingRecipe // must be public for the XML serializer
     //{
     //    public override string Description => "This is a test Description";
 
-    //    public override string Name => "Inserter Recipe";
+    //    public override string Name => "Pipe Recipe";
 
-    //    public override Texture2D IconTexture => ModEntry.Instance.Helper.ModContent.Load<Texture2D>("assets/InserterUpToDown.png");
+    //    public override Texture2D IconTexture => ModEntry.Instance.Helper.ModContent.Load<Texture2D>("assets/PipeUpToDown.png");
 
     //    public override Rectangle? IconSubrect => null;
 
     //    public override IngredientMatcher[] Ingredients => new[] { new ObjectIngredientMatcher(388, 1) }; // , new ObjectIngredientMatcher(SObject.stone, 1)
 
-    //    //public CraftingRecipe NameWithoutLocale = new CraftingRecipe("Inserter", false);
+    //    //public CraftingRecipe NameWithoutLocale = new CraftingRecipe("Pipe", false);
     //    public override Item CreateResult()
     //    {
-    //        return new InserterObject(Vector2.Zero);
+    //        return new ItemPipe(Vector2.Zero);
     //    }
     //}
 
 
 
-    //public class InserterRecipe2 : CraftingRecipePackData // must be public for the XML serializer
+    //public class PipeRecipe2 : CraftingRecipePackData // must be public for the XML serializer
     //{
     //    public string Description => "This is a test Description";
 
-    //    public string Name => "Inserter Recipe";
+    //    public string Name => "Pipe Recipe";
 
-    //    public Texture2D IconTexture => ModEntry.Instance.Helper.ModContent.Load<Texture2D>("assets/InserterUpToDown.png");
+    //    public Texture2D IconTexture => ModEntry.Instance.Helper.ModContent.Load<Texture2D>("assets/PipeUpToDown.png");
 
     //    public Rectangle? IconSubrect => null;
 
@@ -374,10 +374,10 @@ namespace ItemPipes.Inserter
 
     //    public string ID = "997";
 
-    //    //public CraftingRecipe NameWithoutLocale = new CraftingRecipe("Inserter", false);
+    //    //public CraftingRecipe NameWithoutLocale = new CraftingRecipe("Pipe", false);
     //    //public Item CreateResult()
     //    //{
-    //    //    return new InserterObject(Vector2.Zero);
+    //    //    return new ItemPipe(Vector2.Zero);
     //    //}
     //}
 }
