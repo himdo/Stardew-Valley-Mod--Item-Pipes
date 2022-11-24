@@ -177,7 +177,7 @@ namespace ItemPipes.ItemPipeUI
                     itemSlot.UserData = new CustomUIUserData(
                         currentId, 
                         (i % numberOfSlotsPerRow == 0)? 62002: currentId-1, 
-                        (i % numberOfSlotsPerRow == numberOfSlotsPerRow-1)? -1: (i < itemPipeInstance.WhiteListItems.Count - 1) ? currentId + 1 : -1, 
+                        (i % numberOfSlotsPerRow == numberOfSlotsPerRow-1)? -1: (i < itemPipeInstance.WhiteListItems.Count) ? currentId + 1 : -1, 
                         (i < numberOfSlotsPerRow)?-1: currentId - numberOfSlotsPerRow, 
                         (i + numberOfSlotsPerRow <= itemPipeInstance.WhiteListItems.Count) ? currentId+numberOfSlotsPerRow: 62010);
                     rowSlots.Add(itemSlot);
@@ -353,6 +353,12 @@ namespace ItemPipes.ItemPipeUI
                             }
                         }
                     }
+                    else if (Game1.options.doesInputListContain(Game1.options.actionButton, key))
+                    {
+                        var component = getComponentWithID(this.currentlySnappedComponent.myID);
+                        receiveLeftClick(component.bounds.Right - component.bounds.Width / 4, component.bounds.Bottom - component.bounds.Height / 4);
+
+                    }
                 }
                 else
                 {
@@ -470,6 +476,10 @@ namespace ItemPipes.ItemPipeUI
                             }
                         }
                     }
+                    else if (Game1.options.doesInputListContain(Game1.options.actionButton, key))
+                    {
+                        //ModEntry._Monitor.Log($"Action Button Pressed Custom UI", LogLevel.Debug);
+                    }
                 }
             }
             if (Game1.options.doesInputListContain(Game1.options.menuButton, key))
@@ -521,9 +531,12 @@ namespace ItemPipes.ItemPipeUI
                             var itemSlot = (tableChildInner as ItemSlot);
                             if (itemSlot != null && itemSlot.UserData != null)
                             {
+
                                 CustomUIUserData userId = itemSlot.UserData as CustomUIUserData;
                                 if (userId.myID == id)
                                 {
+                                    //ModEntry._Monitor.Log($"Table Neighbers: Left: ${userId.leftNeighborID}, Right: ${userId.rightNeighborID}, Up: ${userId.upNeighborID}, Down: ${userId.downNeighborID}, Whitelisted item count: ${itemPipeInstance.WhiteListItems.Count}", LogLevel.Debug);
+
                                     return itemSlot;
                                 }
                             }
