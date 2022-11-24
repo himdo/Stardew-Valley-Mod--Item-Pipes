@@ -134,7 +134,7 @@ namespace ExampleMod1.InserterUI
                 int numberOfSlotsPerRow = 5;
                 for (int i = 0; i < inserterInstance.WhiteListItems.Count + 1; i++)
                 {
-                var itemSlot = new ItemSlot()
+                    var itemSlot = new ItemSlot()
                     {
                         LocalPosition = new Vector2(10 + (100*(i% numberOfSlotsPerRow)), 150 * ((int)(Math.Ceiling((float) (i+1)/numberOfSlotsPerRow)))),
                         Callback = (e) => AddItem((ItemSlot)e),

@@ -300,6 +300,7 @@ namespace ExampleMod1.Inserter
         {
             //this.FarmerForRenderingCache = null;
             //ModEntry._Monitor.Log($"${field} changed from ${oldValue}, to ${newValue}",LogLevel.Debug);
+            this.SetTextureForDirection();
         }
         protected override string loadDisplayName()
         {
