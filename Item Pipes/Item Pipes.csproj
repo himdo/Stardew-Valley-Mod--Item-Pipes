@@ -7,8 +7,8 @@
     <ProjectGuid>{E45F7F3F-05DA-4159-BD3F-F8CE97ABA597}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ExampleMod1</RootNamespace>
-    <AssemblyName>ExampleMod1</AssemblyName>
+    <RootNamespace>ItemPipes</RootNamespace>
+    <AssemblyName>ItemPipes</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>

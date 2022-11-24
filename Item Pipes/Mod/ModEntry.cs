@@ -1,4 +1,4 @@
-﻿using ExampleMod1.Inserter;
+﻿using ItemPipes.Inserter;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SpaceShared;
@@ -12,7 +12,7 @@ using StardewValley.Menus;
 //using CustomCraftingRecipeCore = SpaceCore.CustomCraftingRecipe;
 using System.Collections.Generic;
 
-namespace ExampleMod1
+namespace ItemPipes
 {
     /// <summary>The mod entry point.</summary>
     public class ModEntry : StardewModdingAPI.Mod

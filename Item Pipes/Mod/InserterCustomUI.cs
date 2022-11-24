@@ -16,9 +16,9 @@ using StardewValley.Objects;
 using StardewValley.Tools;
 using System.Xml.Linq;
 using SObject = StardewValley.Object;
-using ExampleMod1.Inserter;
+using ItemPipes.Inserter;
 
-namespace ExampleMod1.InserterUI
+namespace ItemPipes.InserterUI
 {
     public class InserterCustomUI : MenuWithInventory
     {

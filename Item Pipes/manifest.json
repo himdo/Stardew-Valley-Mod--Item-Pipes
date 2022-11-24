@@ -1,10 +1,10 @@
 ﻿{
-  "Name": "ExampleMod1",
+  "Name": "Item Pipes",
   "Author": "himdo",
   "Version": "1.0.0",
-  "Description": "This is an example mod",
-  "UniqueID": "himdo.ExampleMod1",
-  "EntryDll": "ExampleMod1.dll",
+  "Description": "...",
+  "UniqueID": "himdo.ItemPipes",
+  "EntryDll": "ItemPipes.dll",
   "MinimumApiVersion": "3.13.0",
   "Dependencies": [
     {

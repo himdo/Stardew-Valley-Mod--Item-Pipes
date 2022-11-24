@@ -11,9 +11,9 @@ using SObject = StardewValley.Object;
 
 using System.Collections.Generic;
 using StardewModdingAPI;
-using ExampleMod1.InserterUI;
+using ItemPipes.InserterUI;
 
-namespace ExampleMod1.Inserter
+namespace ItemPipes.Inserter
 {
 
     public enum Directions
