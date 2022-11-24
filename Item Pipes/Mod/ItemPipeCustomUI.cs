@@ -17,15 +17,40 @@ using StardewValley.Tools;
 using System.Xml.Linq;
 using SObject = StardewValley.Object;
 using ItemPipes.ItemPipeObject;
+using StardewValley.Characters;
 
 namespace ItemPipes.ItemPipeUI
 {
+    public class CustomUIUserData
+    {
+        public int myID = -500;
+
+        public int leftNeighborID = -1;
+
+        public int rightNeighborID = -1;
+
+        public int upNeighborID = -1;
+
+        public int downNeighborID = -1;
+
+        public CustomUIUserData(int myID, int leftNeighborID, int rightNeighborID, int upNeighborID, int downNeighborID)
+        {
+            this.myID = myID;
+            this.leftNeighborID = leftNeighborID;
+            this.rightNeighborID = rightNeighborID;
+            this.upNeighborID = upNeighborID;
+            this.downNeighborID = downNeighborID;
+        }
+    }
+
     public class ItemPipeCustomUI : MenuWithInventory
     {
         private RootElement ui;
         private Table table;
         private ItemPipe itemPipeInstance;
         private int heightOffset = -120;
+        private bool interactingWithCustomUi = false;
+        private int interactingWithCustomUiId = -1;
 
         public ItemPipeCustomUI() : base(null, okButton: false, trashCan: false, 0,0)//12, 132)//: base((Game1.uiViewport.Width - 900) / 2, (Game1.uiViewport.Height - (Game1.uiViewport.Height - 100)) / 2, 900, (Game1.uiViewport.Height - 100))
         {
@@ -70,6 +95,7 @@ namespace ItemPipes.ItemPipeUI
                 Callback = (e) => SetPipeDirection(Directions.SouthToNorth),
             };
             SouthToNorth.LocalPosition = new Vector2((width - SouthToNorth.Width) / 2 - moveOverConstant, 150 + heightOffset);
+            SouthToNorth.UserData = new CustomUIUserData(62003, 62001, 62002,-1,62001);
             ui.AddChild(SouthToNorth);
 
             var EastToWest = new Label()
@@ -80,6 +106,7 @@ namespace ItemPipes.ItemPipeUI
                 Callback = (e) => SetPipeDirection(Directions.EastToWest),
             };
             EastToWest.LocalPosition = new Vector2((width - EastToWest.Width) / 2 - 70 - moveOverConstant, 200 + heightOffset);
+            EastToWest.UserData = new CustomUIUserData(62001,-1,62002,62003,62000);
             ui.AddChild(EastToWest);
             var WestToEast = new Label()
             {
@@ -89,6 +116,7 @@ namespace ItemPipes.ItemPipeUI
                 Callback = (e) => SetPipeDirection(Directions.WestToEast),
             };
             WestToEast.LocalPosition = new Vector2((width - WestToEast.Width) / 2 + 70 - moveOverConstant, 200 + heightOffset);
+            WestToEast.UserData = new CustomUIUserData(62002,62001,62100,62003,62000);
             ui.AddChild(WestToEast);
 
             var NorthToSouth = new Label()
@@ -100,6 +128,8 @@ namespace ItemPipes.ItemPipeUI
                 Callback = (e) => SetPipeDirection(Directions.NorthToSouth),
             };
             NorthToSouth.LocalPosition = new Vector2((width - NorthToSouth.Width) / 2 - moveOverConstant, 250 + heightOffset);
+
+            NorthToSouth.UserData = new CustomUIUserData(62000,62001,62002,62001,0);
             ui.AddChild(NorthToSouth);
             var accept = new Label()
             {
@@ -109,6 +139,7 @@ namespace ItemPipes.ItemPipeUI
             };
 
             accept.LocalPosition = new Vector2((width - accept.Width) - 150, height / 2 + 5 + heightOffset);
+            accept.UserData = new CustomUIUserData(62010, -1,-1,62100,9);
             ui.AddChild(accept);
 
 
@@ -142,6 +173,13 @@ namespace ItemPipes.ItemPipeUI
                     {
                         itemSlot.ItemDisplay = itemPipeInstance.WhiteListItems[i];
                     }
+                    int currentId = 62100 + i;
+                    itemSlot.UserData = new CustomUIUserData(
+                        currentId, 
+                        (i % numberOfSlotsPerRow == 0)? 62002: currentId-1, 
+                        (i % numberOfSlotsPerRow == numberOfSlotsPerRow-1)? -1: (i < itemPipeInstance.WhiteListItems.Count - 1) ? currentId + 1 : -1, 
+                        (i < numberOfSlotsPerRow)?-1: currentId - numberOfSlotsPerRow, 
+                        (i + numberOfSlotsPerRow <= itemPipeInstance.WhiteListItems.Count) ? currentId+numberOfSlotsPerRow: 62010);
                     rowSlots.Add(itemSlot);
                     if ((i+1)% numberOfSlotsPerRow == 0)
                     {
@@ -162,9 +200,6 @@ namespace ItemPipes.ItemPipeUI
                 }
             }
             ui.AddChild(table);
-
-            
-
         }
 
         public ItemPipeCustomUI(ItemPipe instance): this()
@@ -224,12 +259,281 @@ namespace ItemPipes.ItemPipeUI
         }
         public override void receiveKeyPress(Keys key)
         {
+            //ModEntry._Monitor.Log($"receiveKeyPress ${key.ToSButton()}", LogLevel.Debug);
+            if (this.currentlySnappedComponent == null)
+            {
+                if (base.inventory.inventory != null && base.inventory.inventory.Count > 0)
+                {
+                    if (base.inventory.allClickableComponents == null)
+                    {
+                        base.inventory.populateClickableComponentList();
+                        this.allClickableComponents = base.inventory.allClickableComponents;
+                    }
+                    // ID 0 is the first slot in the inventory
+                    var component = getComponentWithID(0);
+                    this.currentlySnappedComponent = component;//base.inventory.allClickableComponents.First();
+                    Game1.setMousePosition(component.bounds.Right - component.bounds.Width / 4, component.bounds.Bottom - component.bounds.Height / 4, ui_scale: true);
+                }
+            } else
+            {
+                if (interactingWithCustomUi == false)
+                {
+                    if (Game1.options.doesInputListContain(Game1.options.moveLeftButton, key))
+                    {
+                        int nextId = this.currentlySnappedComponent.leftNeighborID;
+                        if (nextId != -1)
+                        {
+                            var component = getComponentWithID(nextId);
+                            if (component != null)
+                            {
+                                this.currentlySnappedComponent = component;
+                                Game1.setMousePosition(component.bounds.Right - component.bounds.Width / 4, component.bounds.Bottom - component.bounds.Height / 4, ui_scale: true);
+                            }
+                        }
+                    }
+                    else if (Game1.options.doesInputListContain(Game1.options.moveRightButton, key))
+                    {
+                        int nextId = this.currentlySnappedComponent.rightNeighborID;
+                        if (nextId != -1)
+                        {
+                            var component = getComponentWithID(nextId);
+                            if (component != null)
+                            {
+                                this.currentlySnappedComponent = component;
+                                Game1.setMousePosition(component.bounds.Right - component.bounds.Width / 4, component.bounds.Bottom - component.bounds.Height / 4, ui_scale: true);
+                            }
+                        }
+                    }
+                    else if (Game1.options.doesInputListContain(Game1.options.moveUpButton, key))
+                    {
+                        if (this.currentlySnappedComponent.myID >= 0 && this.currentlySnappedComponent.myID < 12) // This is the top row of the inventory
+                        {
+                            interactingWithCustomUi = true;
+                            if (this.currentlySnappedComponent.myID >= 0 && this.currentlySnappedComponent.myID <= 4)
+                            {
+                                interactingWithCustomUiId = 62000;
+                                moveMouseToCustomUIItem();
+                            }
+                            else if (this.currentlySnappedComponent.myID >= 5 && this.currentlySnappedComponent.myID <= 8)
+                            {
+                                interactingWithCustomUiId = 62100;
+                                moveMouseToCustomUIItem();
+                            }
+                            else
+                            {
+                                interactingWithCustomUiId = 62010;
+                                moveMouseToCustomUIItem();
+                            }
+                        }
+                        else
+                        {
+                            int nextId = this.currentlySnappedComponent.upNeighborID;
+                            if (nextId != -1)
+                            {
+                                var component = getComponentWithID(nextId);
+                                if (component != null)
+                                {
+                                    this.currentlySnappedComponent = component;
+                                    Game1.setMousePosition(component.bounds.Right - component.bounds.Width / 4, component.bounds.Bottom - component.bounds.Height / 4, ui_scale: true);
+                                }
+                            }
+                        }
+                    }
+                    else if (Game1.options.doesInputListContain(Game1.options.moveDownButton, key))
+                    {
+                        int nextId = this.currentlySnappedComponent.downNeighborID;
+                        if (nextId != -1)
+                        {
+                            var component = getComponentWithID(nextId);
+
+                            if (component != null)
+                            {
+                                this.currentlySnappedComponent = component;
+                                Game1.setMousePosition(component.bounds.Right - component.bounds.Width / 4, component.bounds.Bottom - component.bounds.Height / 4, ui_scale: true);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    if (Game1.options.doesInputListContain(Game1.options.moveLeftButton, key))
+                    {
+                        var currentElement = GetElementById(interactingWithCustomUiId);
+                        if (currentElement != null)
+                        {
+                            int nextId = (currentElement.UserData as CustomUIUserData).leftNeighborID;
+                            if (nextId != -1)
+                            {
+                                if (nextId < 62000)
+                                {
+                                    interactingWithCustomUi = false;
+                                    interactingWithCustomUiId = -1;
+                                    var component = getComponentWithID(nextId);
+
+                                    if (component != null)
+                                    {
+                                        this.currentlySnappedComponent = component;
+                                        Game1.setMousePosition(component.bounds.Right - component.bounds.Width / 4, component.bounds.Bottom - component.bounds.Height / 4, ui_scale: true);
+                                    }
+                                } else
+                                {
+                                    interactingWithCustomUiId = nextId;
+                                    moveMouseToCustomUIItem();
+                                }
+                            }
+                        }
+                    }
+                    else if (Game1.options.doesInputListContain(Game1.options.moveRightButton, key))
+                    {
+                        var currentElement = GetElementById(interactingWithCustomUiId);
+                        if (currentElement != null)
+                        {
+                            int nextId = (currentElement.UserData as CustomUIUserData).rightNeighborID;
+                            if (nextId != -1)
+                            {
+                                if (nextId < 62000)
+                                {
+                                    interactingWithCustomUi = false;
+                                    interactingWithCustomUiId = -1;
+                                    var component = getComponentWithID(nextId);
+
+                                    if (component != null)
+                                    {
+                                        this.currentlySnappedComponent = component;
+                                        Game1.setMousePosition(component.bounds.Right - component.bounds.Width / 4, component.bounds.Bottom - component.bounds.Height / 4, ui_scale: true);
+                                    }
+
+                                }
+                                else
+                                {
+                                    interactingWithCustomUiId = nextId;
+                                    moveMouseToCustomUIItem();
+                                }
+                            }
+                        }
+                    }
+                    else if (Game1.options.doesInputListContain(Game1.options.moveUpButton, key))
+                    {
+                        var currentElement = GetElementById(interactingWithCustomUiId);
+                        if (currentElement != null)
+                        {
+                            int nextId = (currentElement.UserData as CustomUIUserData).upNeighborID;
+                            if (nextId != -1)
+                            {
+                                if (nextId < 62000)
+                                {
+                                    interactingWithCustomUi = false;
+                                    interactingWithCustomUiId = -1;
+                                    var component = getComponentWithID(nextId);
+
+                                    if (component != null)
+                                    {
+                                        this.currentlySnappedComponent = component;
+                                        Game1.setMousePosition(component.bounds.Right - component.bounds.Width / 4, component.bounds.Bottom - component.bounds.Height / 4, ui_scale: true);
+                                    }
+
+                                }
+                                else
+                                {
+                                    interactingWithCustomUiId = nextId;
+                                    moveMouseToCustomUIItem();
+                                }
+                            }
+                        }
+                    }
+                    else if (Game1.options.doesInputListContain(Game1.options.moveDownButton, key))
+                    {
+                        var currentElement = GetElementById(interactingWithCustomUiId);
+                        if (currentElement != null)
+                        {
+                            int nextId = (currentElement.UserData as CustomUIUserData).downNeighborID;
+                            if (nextId != -1)
+                            {
+                                if (nextId < 62000)
+                                {
+                                    interactingWithCustomUi = false;
+                                    interactingWithCustomUiId = -1;
+                                    var component = getComponentWithID(nextId);
+
+                                    if (component != null)
+                                    {
+                                        this.currentlySnappedComponent = component;
+                                        Game1.setMousePosition(component.bounds.Right - component.bounds.Width / 4, component.bounds.Bottom - component.bounds.Height / 4, ui_scale: true);
+                                    }
+
+                                }
+                                else
+                                {
+                                    interactingWithCustomUiId = nextId;
+                                    moveMouseToCustomUIItem();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             if (Game1.options.doesInputListContain(Game1.options.menuButton, key))
             {
                 Exit();
             }
         }
 
+        private bool moveMouseToCustomUIItem()
+        {
+            return moveMouseToCustomUIItem(interactingWithCustomUiId);
+        }
+        private bool moveMouseToCustomUIItem(int id)
+        {
+            var element = GetElementById(id);
+            if (element == null)
+            {
+                return false;
+            }
+            Game1.setMousePosition(element.Bounds.Right - element.Bounds.Width / 4, element.Bounds.Bottom - element.Bounds.Height / 4, ui_scale: true);
+            return true;
+        }
+
+        private Element GetElementById(int id)
+        {
+            for (int i = 0; i < ui.Children.Count(); i++)
+            {
+                var child = ui.Children[i];
+                if (child.UserData == null && (child as Table) == null)
+                {
+                    continue;
+                }
+                else
+                {
+
+                    if ((child as Table) == null)
+                    {
+                        CustomUIUserData userId = child.UserData as CustomUIUserData;
+                        if (userId.myID == id)
+                        {
+                            return child;
+                        }
+                    } else
+                    {
+                        Table tableChild = child as Table;
+                        for (int tableIndex = 0; tableIndex < tableChild.Children.Length; tableIndex++)
+                        {
+                            var tableChildInner = tableChild.Children[tableIndex];
+                            var itemSlot = (tableChildInner as ItemSlot);
+                            if (itemSlot != null && itemSlot.UserData != null)
+                            {
+                                CustomUIUserData userId = itemSlot.UserData as CustomUIUserData;
+                                if (userId.myID == id)
+                                {
+                                    return itemSlot;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+        
         private void Exit()
         {
             this.exitThisMenuNoSound();
