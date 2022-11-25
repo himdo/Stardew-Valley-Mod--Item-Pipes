@@ -353,12 +353,14 @@ namespace ItemPipes.ItemPipeUI
                             }
                         }
                     }
-                    else if (Game1.options.doesInputListContain(Game1.options.actionButton, key))
-                    {
-                        var component = getComponentWithID(this.currentlySnappedComponent.myID);
-                        receiveLeftClick(component.bounds.Right - component.bounds.Width / 4, component.bounds.Bottom - component.bounds.Height / 4);
-
-                    }
+                    //else if (Game1.options.doesInputListContain(Game1.options.actionButton, key))
+                    //{
+                    //    ModEntry._Monitor.Log($"Action Button Pressed In UI", LogLevel.Debug); // Pressed a on game pad
+                    //}
+                    //else if (Game1.options.doesInputListContain(Game1.options.useToolButton, key))
+                    //{
+                    //    ModEntry._Monitor.Log($"Use Tool Button Pressed In UI", LogLevel.Debug); // Pressed x on game pad
+                    //}
                 }
                 else
                 {
@@ -476,10 +478,14 @@ namespace ItemPipes.ItemPipeUI
                             }
                         }
                     }
-                    else if (Game1.options.doesInputListContain(Game1.options.actionButton, key))
-                    {
-                        //ModEntry._Monitor.Log($"Action Button Pressed Custom UI", LogLevel.Debug);
-                    }
+                    //else if (Game1.options.doesInputListContain(Game1.options.actionButton, key))
+                    //{
+                    //    ModEntry._Monitor.Log($"Action Button Pressed Custom UI", LogLevel.Debug);
+                    //}
+                    //else if (Game1.options.doesInputListContain(Game1.options.useToolButton, key))
+                    //{
+                    //    ModEntry._Monitor.Log($"Use Tool Button Pressed In Custom UI", LogLevel.Debug);
+                    //}
                 }
             }
             if (Game1.options.doesInputListContain(Game1.options.menuButton, key))
