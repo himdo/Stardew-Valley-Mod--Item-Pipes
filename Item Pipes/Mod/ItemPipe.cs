@@ -80,10 +80,12 @@ namespace ItemPipes.ItemPipeObject
         {
             if (!environment.objects.TryGetValue(this.TileLocation - GetFromChestVector(), out SObject objFrom) || !(objFrom is Chest chestFrom))
             {
+                //ModEntry._Monitor.Log($"Object above is not a chest", LogLevel.Debug);
                 return false;
             }
             if (!environment.objects.TryGetValue(this.TileLocation + GetFromChestVector(), out SObject objTo) || !(objTo is Chest chestTo))
             {
+                //ModEntry._Monitor.Log($"Object below is not a chest", LogLevel.Debug);
                 return false;
             }
 
