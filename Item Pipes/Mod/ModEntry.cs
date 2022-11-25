@@ -21,6 +21,7 @@ namespace ItemPipes
         //private static IJsonAssetsApi Ja;
         public static Mod Instance;
         public static IMonitor _Monitor;
+        public static IModHelper helper;
         internal static IJsonAssetsApi Ja;
         //internal static List<CustomCraftingRecipeCore> customCraftingRecipes;
 
@@ -35,9 +36,10 @@ namespace ItemPipes
         {
             ModEntry.Instance = this;
             ModEntry._Monitor = this.Monitor;
+            ModEntry.helper = helper;
+
             helper.Events.GameLoop.GameLaunched += this.GameLaunchedHandler;
             helper.Events.Display.MenuChanged += this.OnMenuChanged;
-            //helper.Events.Input.ButtonPressed += this.OnButtonPressed;
             //helper.Events.Content.AssetRequested += this.OnAssetRequested;
 
         }
@@ -48,9 +50,7 @@ namespace ItemPipes
         *********/
         private void GameLaunchedHandler(object sender, GameLaunchedEventArgs e)
         {
-            //_Monitor.Log($"ModEntry.Ja is starting INIT", LogLevel.Debug);
             //ModEntry.Ja = this.Helper.ModRegistry.GetApi<IJsonAssetsApi>("spacechase0.JsonAssets");
-            //_Monitor.Log($"ModEntry.Ja is INIT", LogLevel.Debug);
 
             var sc = this.Helper.ModRegistry.GetApi<ISpaceCoreApi>("spacechase0.SpaceCore");
             sc.RegisterSerializerType(typeof(ItemPipe));
@@ -78,7 +78,7 @@ namespace ItemPipes
                 Item ItemPipe = new ItemPipe(Vector2.Zero);
                 forSale.Add(ItemPipe);
                 itemPriceAndStock.Add(ItemPipe, new[] { 
-                    1500,            // Price
+                    1500,           // Price
                     int.MaxValue    // Quantity
                 });
             }

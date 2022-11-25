@@ -8,7 +8,6 @@ using StardewValley.Menus;
 using StardewValley.Objects;
 using StardewValley.Tools;
 using SObject = StardewValley.Object;
-
 using System.Collections.Generic;
 using StardewModdingAPI;
 using ItemPipes.ItemPipeUI;
@@ -36,15 +35,6 @@ namespace ItemPipes.ItemPipeObject
         public NetInt FacingDirection = new NetInt((int)Directions.NorthToSouth);
         public NetList<Item, NetRef<Item>> WhiteListItems = new NetList<Item, NetRef<Item>>();
         public NetBool UIOpened = new NetBool(false);
-
-        //public NetInt FacingDirection1
-        //{
-        //    get { return (NetInt)FacingDirection; }
-        //    set
-        //    {
-        //        (NetInt)FacingDirection = value;
-        //    }
-        //}// = new NetInt((int)Directions.NorthToSouth);
 
 
         /*********
@@ -113,6 +103,7 @@ namespace ItemPipes.ItemPipeObject
             ret._GetOneFrom(this);
             return ret;
         }
+
         private bool MoveOneItem(Chest chestFrom, Chest chestTo)
         {
             chestFrom.clearNulls();
@@ -178,11 +169,6 @@ namespace ItemPipes.ItemPipeObject
                     break;
             }
             return FromDirection;
-        }
-
-        public override string getDescription()
-        {
-            return "This Pipe moves items from one chest to another!";
         }
 
         public override bool canStackWith(ISalable other)
@@ -284,10 +270,6 @@ namespace ItemPipes.ItemPipeObject
             float drawLayer = Math.Max(0f, ((y + 1) * 64 - 24) / 10000f) + x * 1E-05f;
             this.draw(spriteBatch, xNonTile: x * Game1.tileSize, yNonTile: y * Game1.tileSize - Game1.tileSize, layerDepth: drawLayer, alpha: alpha);
         }
-        public static string GetNameFromVariantKey(string variantKey)
-        {
-            return "Item Pipe";
-        }
 
         /// <summary>Drop an item onto the ground near the mannequin.</summary>
         /// <param name="location">The location containing the mannequin.</param>
@@ -312,14 +294,17 @@ namespace ItemPipes.ItemPipeObject
 
         private void OnNetFieldChanged<TNetField, TValue>(TNetField field, TValue oldValue, TValue newValue)
         {
-            //this.FarmerForRenderingCache = null;
-            ModEntry._Monitor.Log($"${field} changed from ${oldValue}, to ${newValue}, Faceing Direction: ${this.FacingDirection}",LogLevel.Debug);
             this.FacingDirection.Set(Convert.ToInt32(newValue));
             this.SetTextureForDirection();
         }
         protected override string loadDisplayName()
         {
-            return "Item Pipe";
+            return ModEntry.helper.Translation.Get("item.item-pipe.name");
+        }
+
+        public override string getDescription()
+        {
+            return ModEntry.helper.Translation.Get("item.item-pipe.description");
         }
 
         /// <summary>Get the main mannequin texture to render.</summary>

@@ -54,11 +54,6 @@ namespace ItemPipes.ItemPipeUI
 
         public ItemPipeCustomUI() : base(null, okButton: false, trashCan: false, 0,0)//12, 132)//: base((Game1.uiViewport.Width - 900) / 2, (Game1.uiViewport.Height - (Game1.uiViewport.Height - 100)) / 2, 900, (Game1.uiViewport.Height - 100))
         {
-
-            //int num2 = 0;
-            //int actualCapacity = WhiteListItems.Count + 1;
-            //int rows = 3;
-            //ItemsToGrabMenu = new InventoryMenu(Game1.uiViewport.Width / 2 - num2 / 2, yPositionOnScreen + 64, playerInventory: false, WhiteListItems, InventoryMenu.highlightAllItems, actualCapacity, rows);
             ReCreateUI();
         }
         private void ReCreateUI()
@@ -70,7 +65,7 @@ namespace ItemPipes.ItemPipeUI
 
             var title = new Label()
             {
-                String = "Pipe Configuration",
+                String = ModEntry.helper.Translation.Get("ui.item-pipe.master-title.text"),
                 Bold = true,
             };
             title.LocalPosition = new Vector2((width - title.Width) / 2, 10 + heightOffset);
@@ -80,7 +75,7 @@ namespace ItemPipes.ItemPipeUI
 
             var DirectionText = new Label()
             {
-                String = "Direction:",
+                String = ModEntry.helper.Translation.Get("ui.item-pipe.direction-title.text"),
                 Bold = true,
             };
             DirectionText.LocalPosition = new Vector2(15, 100 + heightOffset);
@@ -89,8 +84,7 @@ namespace ItemPipes.ItemPipeUI
             int moveOverConstant = 300;
             var SouthToNorth = new Label()
             {
-                String = "Up",
-                //String = "↑",
+                String = ModEntry.helper.Translation.Get("ui.item-pipe.direction.up.text"),
                 Bold = this.itemPipeInstance != null ? (int)this.itemPipeInstance.FacingDirection == (int)Directions.SouthToNorth : false,
                 Callback = (e) => SetPipeDirection(Directions.SouthToNorth),
             };
@@ -100,8 +94,7 @@ namespace ItemPipes.ItemPipeUI
 
             var EastToWest = new Label()
             {
-                String = "Left",
-                //String = "→",
+                String = ModEntry.helper.Translation.Get("ui.item-pipe.direction.left.text"),
                 Bold = this.itemPipeInstance != null ? (int)this.itemPipeInstance.FacingDirection == (int)Directions.EastToWest : false,
                 Callback = (e) => SetPipeDirection(Directions.EastToWest),
             };
@@ -110,8 +103,7 @@ namespace ItemPipes.ItemPipeUI
             ui.AddChild(EastToWest);
             var WestToEast = new Label()
             {
-                String = "Right",
-                //String = "←",
+                String = ModEntry.helper.Translation.Get("ui.item-pipe.direction.right.text"),
                 Bold = this.itemPipeInstance != null ? (int)this.itemPipeInstance.FacingDirection == (int)Directions.WestToEast : false,
                 Callback = (e) => SetPipeDirection(Directions.WestToEast),
             };
@@ -122,8 +114,7 @@ namespace ItemPipes.ItemPipeUI
             var NorthToSouth = new Label()
             {
 
-                String = "Down",
-                //String = "↓",
+                String = ModEntry.helper.Translation.Get("ui.item-pipe.direction.down.text"),
                 Bold = this.itemPipeInstance != null ? (int)this.itemPipeInstance.FacingDirection == (int)Directions.NorthToSouth : false,
                 Callback = (e) => SetPipeDirection(Directions.NorthToSouth),
             };
@@ -133,7 +124,7 @@ namespace ItemPipes.ItemPipeUI
             ui.AddChild(NorthToSouth);
             var accept = new Label()
             {
-                String = "Accept",
+                String = ModEntry.helper.Translation.Get("ui.item-pipe.button.accept.text"),
                 Bold = true,
                 Callback = (e) => Accept(),
             };
@@ -145,7 +136,7 @@ namespace ItemPipes.ItemPipeUI
 
             var whitelistText = new Label()
             {
-                String = "Whitelist:",
+                String = ModEntry.helper.Translation.Get("ui.item-pipe.whitelist-title.text"),
                 Bold = true,
             };
             whitelistText.LocalPosition = new Vector2((3*(width - whitelistText.Width)) / 4, 60 + heightOffset);
@@ -606,5 +597,4 @@ namespace ItemPipes.ItemPipeUI
 
         }
     }
-
 }

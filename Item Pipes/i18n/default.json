@@ -1,0 +1,16 @@
+﻿{
+	// item translations
+	"item.item-pipe.name": "Item Pipe",
+	"item.item-pipe.description": "This Pipe moves items from one chest to another!",
+
+	// ui translations
+	"ui.item-pipe.master-title.text": "Pipe Configuration",
+	"ui.item-pipe.direction-title.text": "Direction:",
+	"ui.item-pipe.direction.up.text": "Up", // "↑"
+	"ui.item-pipe.direction.left.text": "Left", // "→"
+	"ui.item-pipe.direction.right.text": "Right", // "←"
+	"ui.item-pipe.direction.down.text": "Down", // "↓"
+	"ui.item-pipe.button.accept.text": "Accept",
+	"ui.item-pipe.whitelist-title.text": "Whitelist:"
+
+}
