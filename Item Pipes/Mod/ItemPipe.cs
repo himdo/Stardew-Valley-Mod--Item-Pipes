@@ -35,6 +35,7 @@ namespace ItemPipes.ItemPipeObject
         public NetInt FacingDirection = new NetInt((int)Directions.NorthToSouth);
         public NetList<Item, NetRef<Item>> WhiteListItems = new NetList<Item, NetRef<Item>>();
         public NetBool UIOpened = new NetBool(false);
+        public NetBool WhiteListMode = new NetBool(true);
 
 
         /*********
@@ -120,10 +121,20 @@ namespace ItemPipes.ItemPipeObject
                     for (int itemCount = 0; itemCount < WhiteListItems.Count; itemCount++)
                     {
                         Item whiteListItem = WhiteListItems[itemCount];
-                        if (itemOne.canStackWith(whiteListItem) || (itemOne.ParentSheetIndex == whiteListItem.ParentSheetIndex && (item as SObject).quality.Value == (whiteListItem as SObject).quality.Value))
+                        if (WhiteListMode)
                         {
-                            canMoveItem = true;
-                            break;
+                            if (itemOne.canStackWith(whiteListItem) || (itemOne.ParentSheetIndex == whiteListItem.ParentSheetIndex && (item as SObject).quality.Value == (whiteListItem as SObject).quality.Value))
+                            {
+                                canMoveItem = true;
+                                break;
+                            }
+                        } else
+                        {
+                            if (!itemOne.canStackWith(whiteListItem) || !(itemOne.ParentSheetIndex == whiteListItem.ParentSheetIndex && (item as SObject).quality.Value == (whiteListItem as SObject).quality.Value))
+                            {
+                                canMoveItem = true;
+                                break;
+                            }
                         }
                     }
                 }
@@ -289,9 +300,14 @@ namespace ItemPipes.ItemPipeObject
         protected override void initNetFields()
         {
             base.initNetFields();
-            this.NetFields.AddFields(this.FacingDirection, this.WhiteListItems, this.UIOpened);
+            this.NetFields.AddFields(this.FacingDirection, this.WhiteListItems, this.UIOpened, this.WhiteListMode);
 
             this.FacingDirection.fieldChangeEvent += this.OnNetFieldChanged;
+        }
+
+        public void ToggleWhiteListMode()
+        {
+            this.WhiteListMode.Set(!this.WhiteListMode);
         }
 
         private void OnNetFieldChanged<TNetField, TValue>(TNetField field, TValue oldValue, TValue newValue)

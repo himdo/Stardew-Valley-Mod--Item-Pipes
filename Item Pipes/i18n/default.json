@@ -11,6 +11,7 @@
 	"ui.item-pipe.direction.right.text": "Right", // "←"
 	"ui.item-pipe.direction.down.text": "Down", // "↓"
 	"ui.item-pipe.button.accept.text": "Accept",
-	"ui.item-pipe.whitelist-title.text": "Whitelist:"
+	"ui.item-pipe.whitelist-title.text": "Whitelist:",
+	"ui.item-pipe.blacklist-title.text": "Blacklist:"
 
 }

@@ -51,6 +51,7 @@ namespace ItemPipes.ItemPipeUI
         private int heightOffset = -120;
         private bool interactingWithCustomUi = false;
         private int interactingWithCustomUiId = -1;
+        private bool deBouncer = true;
 
         public ItemPipeCustomUI() : base(null, okButton: false, trashCan: false, 0,0)//12, 132)//: base((Game1.uiViewport.Width - 900) / 2, (Game1.uiViewport.Height - (Game1.uiViewport.Height - 100)) / 2, 900, (Game1.uiViewport.Height - 100))
         {
@@ -132,15 +133,24 @@ namespace ItemPipes.ItemPipeUI
             accept.LocalPosition = new Vector2((width - accept.Width) - 150, height / 2 + 5 + heightOffset);
             accept.UserData = new CustomUIUserData(62010, -1,-1,62100,9);
             ui.AddChild(accept);
-
-
             var whitelistText = new Label()
             {
-                String = ModEntry.helper.Translation.Get("ui.item-pipe.whitelist-title.text"),
+                String = (this.itemPipeInstance != null && this.itemPipeInstance.WhiteListMode == true) ? ModEntry.helper.Translation.Get("ui.item-pipe.whitelist-title.text") : ModEntry.helper.Translation.Get("ui.item-pipe.blacklist-title.text"),
                 Bold = true,
             };
             whitelistText.LocalPosition = new Vector2((3*(width - whitelistText.Width)) / 4, 60 + heightOffset);
             ui.AddChild(whitelistText);
+
+
+            var whitelistBlacklistToggle = new Checkbox()
+            {
+                Callback = (e) => ToggleButton(),
+                Checked = (this.itemPipeInstance != null && this.itemPipeInstance.WhiteListMode == true)? true : false,
+            };
+            whitelistBlacklistToggle.LocalPosition = new Vector2(whitelistText.LocalPosition.X - 60, whitelistText.LocalPosition.Y);
+
+            whitelistBlacklistToggle.UserData = new CustomUIUserData(62011, 62003,-1,-1, 62100);
+            ui.AddChild(whitelistBlacklistToggle);
 
             table = new Table()
             {
@@ -169,7 +179,7 @@ namespace ItemPipes.ItemPipeUI
                         currentId, 
                         (i % numberOfSlotsPerRow == 0)? 62002: currentId-1, 
                         (i % numberOfSlotsPerRow == numberOfSlotsPerRow-1)? -1: (i < itemPipeInstance.WhiteListItems.Count) ? currentId + 1 : -1, 
-                        (i < numberOfSlotsPerRow)?-1: currentId - numberOfSlotsPerRow, 
+                        (i < numberOfSlotsPerRow)? 62011 : currentId - numberOfSlotsPerRow, 
                         (i + numberOfSlotsPerRow <= itemPipeInstance.WhiteListItems.Count) ? currentId+numberOfSlotsPerRow: 62010);
                     rowSlots.Add(itemSlot);
                     if ((i+1)% numberOfSlotsPerRow == 0)
@@ -560,6 +570,39 @@ namespace ItemPipes.ItemPipeUI
         private void Accept()
         {
             Exit();
+        }
+
+        private void ToggleButton()
+        {
+            if (deBouncer == true)
+            {
+                deBouncer = false;
+                this.itemPipeInstance.ToggleWhiteListMode();
+                ReCreateUI();
+                DelayedAction.functionAfterDelay(AllowDebouncer, 500);
+                
+                switch (this.itemPipeInstance.FacingDirection)
+                {
+                    case (int)Directions.NorthToSouth:
+                        interactingWithCustomUiId = 62000;
+                        break;
+                    case (int)Directions.SouthToNorth:
+                        interactingWithCustomUiId = 62003;
+                        break;
+                    case (int)Directions.EastToWest:
+                        interactingWithCustomUiId = 62001;
+                        break;
+                    case (int)Directions.WestToEast:
+                        interactingWithCustomUiId = 62002;
+                        break;
+                }
+                moveMouseToCustomUIItem();
+            }
+        }
+
+        private void AllowDebouncer()
+        {
+            deBouncer = true;
         }
 
         public override void receiveScrollWheelAction(int direction)
