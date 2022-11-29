@@ -220,6 +220,8 @@ namespace ItemPipes.ItemPipeUI
                     string downText = ModEntry.helper.Translation.Get("ui.item-pipe.direction.down.text");
                     string leftText = ModEntry.helper.Translation.Get("ui.item-pipe.direction.left.text");
                     string rightText = ModEntry.helper.Translation.Get("ui.item-pipe.direction.right.text");
+                    string whitelistText = ModEntry.helper.Translation.Get("ui.item-pipe.whitelist-title.text");
+                    string blacklistText = ModEntry.helper.Translation.Get("ui.item-pipe.blacklist-title.text");
                     if (labelTest.String == upText)
                     {
                         labelTest.Bold = this.itemPipeInstance != null ? (int)this.itemPipeInstance.FacingDirection == (int)Directions.SouthToNorth : false;
@@ -235,6 +237,9 @@ namespace ItemPipes.ItemPipeUI
                     else if (labelTest.String == rightText)
                     {
                         labelTest.Bold = this.itemPipeInstance != null ? (int)this.itemPipeInstance.FacingDirection == (int)Directions.WestToEast : false;
+                    } else if (labelTest.String == whitelistText || labelTest.String == blacklistText)
+                    {
+                        labelTest.String = (this.itemPipeInstance != null && this.itemPipeInstance.WhiteListMode == true) ? ModEntry.helper.Translation.Get("ui.item-pipe.whitelist-title.text") : ModEntry.helper.Translation.Get("ui.item-pipe.blacklist-title.text");
                     }
                 } else if (tableTest != null)
                 {
@@ -624,6 +629,7 @@ namespace ItemPipes.ItemPipeUI
             {
                 deBouncer = false;
                 this.itemPipeInstance.ToggleWhiteListMode();
+                updateInPlace();
                 DelayedAction.functionAfterDelay(AllowDebouncer, 500);
                 
                 switch (this.itemPipeInstance.FacingDirection)
