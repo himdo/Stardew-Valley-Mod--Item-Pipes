@@ -668,7 +668,7 @@ namespace ItemPipes.ItemPipeUI
                 bool foundCopy = false;
                 for (int i = 0; i < itemPipeInstance.WhiteListItems.Count; i++)
                 {
-                    if ((base.heldItem as SObject) != null && itemPipeInstance.WhiteListItems[i].ParentSheetIndex == base.heldItem.ParentSheetIndex && (itemPipeInstance.WhiteListItems[i] as SObject).quality.Value == (base.heldItem as SObject).quality.Value)
+                    if (((base.heldItem as StardewValley.Tool) != null && base.heldItem.Name == itemPipeInstance.WhiteListItems[i].Name) || ((base.heldItem as SObject) != null && itemPipeInstance.WhiteListItems[i].ParentSheetIndex == base.heldItem.ParentSheetIndex && (itemPipeInstance.WhiteListItems[i] as SObject).quality.Value == (base.heldItem as SObject).quality.Value))
                     {
                         foundCopy = true;
                         break;
