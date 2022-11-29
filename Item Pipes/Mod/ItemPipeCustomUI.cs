@@ -151,54 +151,12 @@ namespace ItemPipes.ItemPipeUI
 
             whitelistBlacklistToggle.UserData = new CustomUIUserData(62011, 62003,-1,-1, 62100);
             ui.AddChild(whitelistBlacklistToggle);
-
-            table = new Table()
+            Table oldTable = this.table;
+            
+            RemakeTable();
+            if (oldTable != null)
             {
-                RowHeight = (128 - 16) / 8,
-                Size = new Vector2(width/2 + 80, height/2 - 165),
-                LocalPosition = new Vector2(width/2 - 120, 10),
-            };
-
-            if (this.itemPipeInstance != null)
-            {
-                List<Element> rowSlots = new List<Element>();
-                int numberOfSlotsPerRow = 5;
-                for (int i = 0; i < itemPipeInstance.WhiteListItems.Count + 1; i++)
-                {
-                    var itemSlot = new ItemSlot()
-                    {
-                        LocalPosition = new Vector2(10 + (100*(i% numberOfSlotsPerRow)), 150 * ((int)(Math.Ceiling((float) (i+1)/numberOfSlotsPerRow)))),
-                        Callback = (e) => AddItem((ItemSlot)e),
-                    };
-                    if (i < itemPipeInstance.WhiteListItems.Count)
-                    {
-                        itemSlot.ItemDisplay = itemPipeInstance.WhiteListItems[i];
-                    }
-                    int currentId = 62100 + i;
-                    itemSlot.UserData = new CustomUIUserData(
-                        currentId, 
-                        (i % numberOfSlotsPerRow == 0)? 62002: currentId-1, 
-                        (i % numberOfSlotsPerRow == numberOfSlotsPerRow-1)? -1: (i < itemPipeInstance.WhiteListItems.Count) ? currentId + 1 : -1, 
-                        (i < numberOfSlotsPerRow)? 62011 : currentId - numberOfSlotsPerRow, 
-                        (i + numberOfSlotsPerRow <= itemPipeInstance.WhiteListItems.Count) ? currentId+numberOfSlotsPerRow: 62010);
-                    rowSlots.Add(itemSlot);
-                    if ((i+1)% numberOfSlotsPerRow == 0)
-                    {
-                        table.AddRow(rowSlots.ToArray());
-                        // This appears to only put blank spaces
-                        for (int j = 0; j < 2; ++j)
-                            table.AddRow(new Element[0]);
-                        rowSlots = new List<Element>();
-                    }
-                }
-                if (rowSlots.Count > 0)
-                {
-                    table.AddRow(rowSlots.ToArray());
-                    // This appears to only put blank spaces
-                    for (int j = 0; j < 2; ++j)
-                        table.AddRow(new Element[0]);
-                    rowSlots = new List<Element>();
-                }
+                table.Scrollbar.ScrollTo(oldTable.Scrollbar.TopRow);
             }
             ui.AddChild(table);
         }
@@ -207,7 +165,6 @@ namespace ItemPipes.ItemPipeUI
         {
             itemPipeInstance = instance;
             ReCreateUI();
-
         }
         public override void draw(SpriteBatch b)
         {
@@ -247,6 +204,43 @@ namespace ItemPipes.ItemPipeUI
         public override void update(GameTime time)
         {
             ui.Update();
+        }
+
+        public void updateInPlace()
+        {
+            List<Element> elementsToRemove = new List<Element>();
+            for (int i = 0; i < ui.Children.Length; i++)
+            {
+                Element child = ui.Children[i];
+                var labelTest = child as Label;
+                var tableTest = child as Table;
+                if (labelTest != null)
+                {
+                    string upText = ModEntry.helper.Translation.Get("ui.item-pipe.direction.up.text");
+                    string downText = ModEntry.helper.Translation.Get("ui.item-pipe.direction.down.text");
+                    string leftText = ModEntry.helper.Translation.Get("ui.item-pipe.direction.left.text");
+                    string rightText = ModEntry.helper.Translation.Get("ui.item-pipe.direction.right.text");
+                    if (labelTest.String == upText)
+                    {
+                        labelTest.Bold = this.itemPipeInstance != null ? (int)this.itemPipeInstance.FacingDirection == (int)Directions.SouthToNorth : false;
+                    }
+                    else if (labelTest.String == downText)
+                    {
+                        labelTest.Bold = this.itemPipeInstance != null ? (int)this.itemPipeInstance.FacingDirection == (int)Directions.NorthToSouth : false;
+                    }
+                    else if (labelTest.String == leftText)
+                    {
+                        labelTest.Bold = this.itemPipeInstance != null ? (int)this.itemPipeInstance.FacingDirection == (int)Directions.EastToWest : false;
+                    }
+                    else if (labelTest.String == rightText)
+                    {
+                        labelTest.Bold = this.itemPipeInstance != null ? (int)this.itemPipeInstance.FacingDirection == (int)Directions.WestToEast : false;
+                    }
+                } else if (tableTest != null)
+                {
+                    // Child is a Table
+                }
+            }
         }
         protected override void cleanupBeforeExit()
         {
@@ -564,12 +558,64 @@ namespace ItemPipes.ItemPipeUI
             if (this.itemPipeInstance != null)
             {
                 this.itemPipeInstance.ChangeDirection(direction);
-                ReCreateUI();
+                this.updateInPlace();
             }
         }
         private void Accept()
         {
             Exit();
+        }
+
+        private void RemakeTable()
+        {
+            table = new Table()
+            {
+                RowHeight = (128 - 16) / 8,
+                Size = new Vector2(width / 2 + 80, height / 2 - 165),
+                LocalPosition = new Vector2(width / 2 - 120, 10),
+            };
+
+            if (this.itemPipeInstance != null)
+            {
+                List<Element> rowSlots = new List<Element>();
+                int numberOfSlotsPerRow = 5;
+                for (int i = 0; i < itemPipeInstance.WhiteListItems.Count + 1; i++)
+                {
+                    var itemSlot = new ItemSlot()
+                    {
+                        LocalPosition = new Vector2(10 + (100 * (i % numberOfSlotsPerRow)), 150 * ((int)(Math.Ceiling((float)(i + 1) / numberOfSlotsPerRow)))),
+                        Callback = (e) => AddItem((ItemSlot)e),
+                    };
+                    if (i < itemPipeInstance.WhiteListItems.Count)
+                    {
+                        itemSlot.ItemDisplay = itemPipeInstance.WhiteListItems[i];
+                    }
+                    int currentId = 62100 + i;
+                    itemSlot.UserData = new CustomUIUserData(
+                        currentId,
+                        (i % numberOfSlotsPerRow == 0) ? 62002 : currentId - 1,
+                        (i % numberOfSlotsPerRow == numberOfSlotsPerRow - 1) ? -1 : (i < itemPipeInstance.WhiteListItems.Count) ? currentId + 1 : -1,
+                        (i < numberOfSlotsPerRow) ? 62011 : currentId - numberOfSlotsPerRow,
+                        (i + numberOfSlotsPerRow <= itemPipeInstance.WhiteListItems.Count) ? currentId + numberOfSlotsPerRow : 62010);
+                    rowSlots.Add(itemSlot);
+                    if ((i + 1) % numberOfSlotsPerRow == 0)
+                    {
+                        table.AddRow(rowSlots.ToArray());
+                        // This appears to only put blank spaces
+                        for (int j = 0; j < 2; ++j)
+                            table.AddRow(new Element[0]);
+                        rowSlots = new List<Element>();
+                    }
+                }
+                if (rowSlots.Count > 0)
+                {
+                    table.AddRow(rowSlots.ToArray());
+                    // This appears to only put blank spaces
+                    for (int j = 0; j < 2; ++j)
+                        table.AddRow(new Element[0]);
+                    rowSlots = new List<Element>();
+                }
+            }
         }
 
         private void ToggleButton()
@@ -578,7 +624,6 @@ namespace ItemPipes.ItemPipeUI
             {
                 deBouncer = false;
                 this.itemPipeInstance.ToggleWhiteListMode();
-                ReCreateUI();
                 DelayedAction.functionAfterDelay(AllowDebouncer, 500);
                 
                 switch (this.itemPipeInstance.FacingDirection)
@@ -623,7 +668,7 @@ namespace ItemPipes.ItemPipeUI
                 bool foundCopy = false;
                 for (int i = 0; i < itemPipeInstance.WhiteListItems.Count; i++)
                 {
-                    if (itemPipeInstance.WhiteListItems[i].ParentSheetIndex == base.heldItem.ParentSheetIndex && (itemPipeInstance.WhiteListItems[i] as SObject).quality.Value == (base.heldItem as SObject).quality.Value)
+                    if ((base.heldItem as SObject) != null && itemPipeInstance.WhiteListItems[i].ParentSheetIndex == base.heldItem.ParentSheetIndex && (itemPipeInstance.WhiteListItems[i] as SObject).quality.Value == (base.heldItem as SObject).quality.Value)
                     {
                         foundCopy = true;
                         break;
@@ -634,10 +679,8 @@ namespace ItemPipes.ItemPipeUI
                     itemPipeInstance.WhiteListItems.Add(base.heldItem.getOne());
                     e.ItemDisplay = base.heldItem.getOne();
                     ReCreateUI();
-
                 }
             }
-
         }
     }
 }
