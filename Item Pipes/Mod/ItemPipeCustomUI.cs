@@ -18,6 +18,7 @@ using System.Xml.Linq;
 using SObject = StardewValley.Object;
 using ItemPipes.ItemPipeObject;
 using StardewValley.Characters;
+using System.Windows.Input;
 
 namespace ItemPipes.ItemPipeUI
 {
@@ -51,7 +52,8 @@ namespace ItemPipes.ItemPipeUI
         private int heightOffset = -120;
         private bool interactingWithCustomUi = false;
         private int interactingWithCustomUiId = -1;
-        private bool deBouncer = true;
+        private bool ClickedOnWhitelistToggle = false;
+        private bool ClickedOnWhitelistItem = false;
 
         public ItemPipeCustomUI() : base(null, okButton: false, trashCan: false, 0,0)//12, 132)//: base((Game1.uiViewport.Width - 900) / 2, (Game1.uiViewport.Height - (Game1.uiViewport.Height - 100)) / 2, 900, (Game1.uiViewport.Height - 100))
         {
@@ -142,10 +144,11 @@ namespace ItemPipes.ItemPipeUI
             ui.AddChild(whitelistText);
 
 
-            var whitelistBlacklistToggle = new Checkbox()
+            var whitelistBlacklistToggle = new Label()
             {
+                String = "*",
+                Bold = true,
                 Callback = (e) => ToggleButton(),
-                Checked = (this.itemPipeInstance != null && this.itemPipeInstance.WhiteListMode == true)? true : false,
             };
             whitelistBlacklistToggle.LocalPosition = new Vector2(whitelistText.LocalPosition.X - 60, whitelistText.LocalPosition.Y);
 
@@ -204,6 +207,14 @@ namespace ItemPipes.ItemPipeUI
         public override void update(GameTime time)
         {
             ui.Update();
+            if (ClickedOnWhitelistItem == true && Game1.didPlayerJustLeftClick() == false)
+            {
+                ClickedOnWhitelistItem = false;
+            }
+            if (ClickedOnWhitelistToggle == true && Game1.didPlayerJustLeftClick() == false)
+            {
+                ClickedOnWhitelistToggle = false;
+            }
         }
 
         public void updateInPlace()
@@ -625,35 +636,27 @@ namespace ItemPipes.ItemPipeUI
 
         private void ToggleButton()
         {
-            if (deBouncer == true)
-            {
-                deBouncer = false;
-                this.itemPipeInstance.ToggleWhiteListMode();
-                updateInPlace();
-                DelayedAction.functionAfterDelay(AllowDebouncer, 500);
+            if (ClickedOnWhitelistToggle == true) return;
+            ClickedOnWhitelistToggle = true;
+            this.itemPipeInstance.ToggleWhiteListMode();
+            updateInPlace();
                 
-                switch (this.itemPipeInstance.FacingDirection)
-                {
-                    case (int)Directions.NorthToSouth:
-                        interactingWithCustomUiId = 62000;
-                        break;
-                    case (int)Directions.SouthToNorth:
-                        interactingWithCustomUiId = 62003;
-                        break;
-                    case (int)Directions.EastToWest:
-                        interactingWithCustomUiId = 62001;
-                        break;
-                    case (int)Directions.WestToEast:
-                        interactingWithCustomUiId = 62002;
-                        break;
-                }
-                moveMouseToCustomUIItem();
-            }
-        }
-
-        private void AllowDebouncer()
-        {
-            deBouncer = true;
+            //switch (this.itemPipeInstance.FacingDirection)
+            //{
+            //    case (int)Directions.NorthToSouth:
+            //        interactingWithCustomUiId = 62000;
+            //        break;
+            //    case (int)Directions.SouthToNorth:
+            //        interactingWithCustomUiId = 62003;
+            //        break;
+            //    case (int)Directions.EastToWest:
+            //        interactingWithCustomUiId = 62001;
+            //        break;
+            //    case (int)Directions.WestToEast:
+            //        interactingWithCustomUiId = 62002;
+            //        break;
+            //}
+            //moveMouseToCustomUIItem();
         }
 
         public override void receiveScrollWheelAction(int direction)
@@ -663,8 +666,10 @@ namespace ItemPipes.ItemPipeUI
 
         private void AddItem(ItemSlot e)
         {
+            if (ClickedOnWhitelistItem) return;
             if (base.heldItem == null)
             {
+                ClickedOnWhitelistItem = true;
                 itemPipeInstance.WhiteListItems.Remove(e.ItemDisplay);
                 e.ItemDisplay = null;
                 ReCreateUI();
@@ -682,6 +687,7 @@ namespace ItemPipes.ItemPipeUI
                 }
                 if (foundCopy == false)
                 {
+                    ClickedOnWhitelistItem = true;
                     itemPipeInstance.WhiteListItems.Add(base.heldItem.getOne());
                     e.ItemDisplay = base.heldItem.getOne();
                     ReCreateUI();
