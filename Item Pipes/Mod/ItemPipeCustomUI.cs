@@ -5,25 +5,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using SpaceCore.UI;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
-using StardewValley.Minigames;
-using System.Reflection;
-using StardewModdingAPI;
-using StardewValley.Objects;
-using StardewValley.Tools;
-using System.Xml.Linq;
 using SObject = StardewValley.Object;
 using ItemPipes.ItemPipeObject;
-using StardewValley.Characters;
-using System.Windows.Input;
-using Netcode;
-using System.Xml.Serialization;
 using System.IO;
-using System.Text.RegularExpressions;
-using static System.IO.MemoryStream;
 
 namespace ItemPipes.ItemPipeUI
 {

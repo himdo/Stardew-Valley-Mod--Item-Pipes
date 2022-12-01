@@ -4,16 +4,10 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Netcode;
 using StardewValley;
-using StardewValley.Menus;
 using StardewValley.Objects;
 using StardewValley.Tools;
 using SObject = StardewValley.Object;
-using System.Collections.Generic;
-using StardewModdingAPI;
 using ItemPipes.ItemPipeUI;
-using StardewValley.Network;
-using System.Xml;
-using System.IO;
 
 namespace ItemPipes.ItemPipeObject
 {
@@ -364,14 +358,6 @@ namespace ItemPipes.ItemPipeObject
             }
         }
 
-
-        //public void Serialize()
-        //{
-        //    TextWriter writer = new StreamWriter(SchedulePath);
-        //    XmlSerializer xmlSerializer = new XmlSerializer(typeof(List<Derived>), new[] { typeof(Derived) });
-        //    xmlSerializer.Serialize(writer, data);
-        //    writer.Close();
-        //}
     }
 
     //public class PipeRecipe : CustomCraftingRecipe // must be public for the XML serializer

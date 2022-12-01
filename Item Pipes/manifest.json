@@ -1,7 +1,7 @@
 ﻿{
   "Name": "Item Pipes",
   "Author": "himdo",
-  "Version": "0.2.0",
+  "Version": "0.2.1",
   "Description": "...",
   "UniqueID": "himdo.ItemPipes",
   "EntryDll": "ItemPipes.dll",
