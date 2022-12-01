@@ -19,6 +19,11 @@ using SObject = StardewValley.Object;
 using ItemPipes.ItemPipeObject;
 using StardewValley.Characters;
 using System.Windows.Input;
+using Netcode;
+using System.Xml.Serialization;
+using System.IO;
+using System.Text.RegularExpressions;
+using static System.IO.MemoryStream;
 
 namespace ItemPipes.ItemPipeUI
 {
@@ -41,6 +46,21 @@ namespace ItemPipes.ItemPipeUI
             this.rightNeighborID = rightNeighborID;
             this.upNeighborID = upNeighborID;
             this.downNeighborID = downNeighborID;
+        }
+    }
+
+
+    public class ItemPipeDataModel
+    {
+        // This is used for the copy paste ui save feature
+        public int FacingDirection = (int)Directions.NorthToSouth;
+        public string WhiteListItems;
+        public bool WhiteListMode = true;
+        public ItemPipeDataModel(int FacingDirection, string WhiteListItems, bool WhiteListMode)
+        {
+            this.FacingDirection = FacingDirection;
+            this.WhiteListItems = WhiteListItems;
+            this.WhiteListMode = WhiteListMode;
         }
     }
 
@@ -133,8 +153,28 @@ namespace ItemPipes.ItemPipeUI
             };
 
             accept.LocalPosition = new Vector2((width - accept.Width) - 150, height / 2 + 5 + heightOffset);
-            accept.UserData = new CustomUIUserData(62010, -1,-1,62100,9);
+            accept.UserData = new CustomUIUserData(62010, 62012, -1, 62100, 9);
             ui.AddChild(accept);
+            var Copy = new Label()
+            {
+                String = ModEntry.helper.Translation.Get("ui.item-pipe.button.copy.text"),
+                Bold = true,
+                Callback = (e) => CopyUI(),
+            };
+
+            Copy.LocalPosition = new Vector2((width - Copy.Width) - 150 - 350, height / 2 + 5 + heightOffset);
+            Copy.UserData = new CustomUIUserData(62013, -1, 62012, 62100, 9);
+            ui.AddChild(Copy);
+            var Paste = new Label()
+            {
+                String = ModEntry.helper.Translation.Get("ui.item-pipe.button.paste.text"),
+                Bold = true,
+                Callback = (e) => PasteUI(),
+            };
+
+            Paste.LocalPosition = new Vector2((width - Paste.Width) - 150 - 200, height / 2 + 5 + heightOffset);
+            Paste.UserData = new CustomUIUserData(62012, 62013, 62010, 62100, 9);
+            ui.AddChild(Paste);
             var whitelistText = new Label()
             {
                 String = (this.itemPipeInstance != null && this.itemPipeInstance.WhiteListMode == true) ? ModEntry.helper.Translation.Get("ui.item-pipe.whitelist-title.text") : ModEntry.helper.Translation.Get("ui.item-pipe.blacklist-title.text"),
@@ -171,8 +211,10 @@ namespace ItemPipes.ItemPipeUI
         }
         public override void draw(SpriteBatch b)
         {
-            IClickableMenu.drawTextureBox(b, xPositionOnScreen, yPositionOnScreen + heightOffset, width, height / 2, Color.White);
-            IClickableMenu.drawTextureBox(b, xPositionOnScreen + width-310, yPositionOnScreen + height / 2 - 130, 170,75, Color.White);
+            IClickableMenu.drawTextureBox(b, xPositionOnScreen, yPositionOnScreen + heightOffset, width, height / 2, Color.White); // Upper Part
+            IClickableMenu.drawTextureBox(b, xPositionOnScreen + width - 310, yPositionOnScreen + height / 2 - 130, 170, 75, Color.White); // Accept Button
+            IClickableMenu.drawTextureBox(b, xPositionOnScreen + width - 310 - 190, yPositionOnScreen + height / 2 - 130, 170, 75, Color.White); // Paste  Button
+            IClickableMenu.drawTextureBox(b, xPositionOnScreen + width - 310 - 310, yPositionOnScreen + height / 2 - 130, 140, 75, Color.White); // Copy   Button
             base.draw(b, false, false);
 
             ui.Draw(b);
@@ -640,28 +682,43 @@ namespace ItemPipes.ItemPipeUI
             ClickedOnWhitelistToggle = true;
             this.itemPipeInstance.ToggleWhiteListMode();
             updateInPlace();
-                
-            //switch (this.itemPipeInstance.FacingDirection)
-            //{
-            //    case (int)Directions.NorthToSouth:
-            //        interactingWithCustomUiId = 62000;
-            //        break;
-            //    case (int)Directions.SouthToNorth:
-            //        interactingWithCustomUiId = 62003;
-            //        break;
-            //    case (int)Directions.EastToWest:
-            //        interactingWithCustomUiId = 62001;
-            //        break;
-            //    case (int)Directions.WestToEast:
-            //        interactingWithCustomUiId = 62002;
-            //        break;
-            //}
-            //moveMouseToCustomUIItem();
         }
 
         public override void receiveScrollWheelAction(int direction)
         {
             this.table.Scrollbar.ScrollBy(direction / -120);
+        }
+        private void PasteUI()
+        {
+            // Read the UI and Save the ItemPipeDataModel
+            var model = ModEntry.helper.Data.ReadSaveData<ItemPipeDataModel>("himdo_itempipe_paste_data");
+            if (model != null)
+            {
+                ItemPipe ip = this.itemPipeInstance;
+                ip.ChangeDirection(model.FacingDirection);
+                ip.WhiteListMode.Set(model.WhiteListMode);
+
+                // Below Deserialize the list of items in the white list filter and puts it into the list
+                var ls = SaveGame.GetSerializer(typeof(List<Item>));
+                MemoryStream ms = new MemoryStream(Encoding.Unicode.GetBytes(model.WhiteListItems));
+                List<Item> l = (List<Item>)ls.Deserialize(ms);
+                ip.WhiteListItems.Set(l);
+
+                ReCreateUI();
+            }
+        }
+        
+        private void CopyUI()
+        {
+            // Read the ItemPipeDataModel and Implement into UI
+
+            // Below Serializes the list of items in the white list filter and puts it into save data
+            MemoryStream ms = new MemoryStream();
+            var ls = SaveGame.GetSerializer(typeof(List<Item>));
+            ls.Serialize(ms, itemPipeInstance.WhiteListItems.ToList<Item>());
+
+            ItemPipeDataModel ipdm = new ItemPipeDataModel(this.itemPipeInstance.FacingDirection, Encoding.ASCII.GetString(ms.ToArray()), this.itemPipeInstance.WhiteListMode);
+            ModEntry.helper.Data.WriteSaveData("himdo_itempipe_paste_data", ipdm);
         }
 
         private void AddItem(ItemSlot e)

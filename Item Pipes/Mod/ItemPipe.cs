@@ -12,6 +12,8 @@ using System.Collections.Generic;
 using StardewModdingAPI;
 using ItemPipes.ItemPipeUI;
 using StardewValley.Network;
+using System.Xml;
+using System.IO;
 
 namespace ItemPipes.ItemPipeObject
 {
@@ -26,6 +28,7 @@ namespace ItemPipes.ItemPipeObject
 
 
     [XmlType("Mods_himdo_ItemPipe")]
+    [System.Xml.Serialization.XmlInclude(typeof(Item))]
     public class ItemPipe : SObject // must be public for the XML serializer
     {
         /*********
@@ -360,6 +363,15 @@ namespace ItemPipes.ItemPipeObject
                     break;
             }
         }
+
+
+        //public void Serialize()
+        //{
+        //    TextWriter writer = new StreamWriter(SchedulePath);
+        //    XmlSerializer xmlSerializer = new XmlSerializer(typeof(List<Derived>), new[] { typeof(Derived) });
+        //    xmlSerializer.Serialize(writer, data);
+        //    writer.Close();
+        //}
     }
 
     //public class PipeRecipe : CustomCraftingRecipe // must be public for the XML serializer
